@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node *)",
+      "Bash(curl *)",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"node serve.mjs\")",
+      "Bash(netstat -lnt)"
+    ]
+  }
+}
