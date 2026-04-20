@@ -291,6 +291,48 @@
     .nav-link:hover::after { width: 100%; }
     .nav-link:focus-visible { outline: 2px solid rgba(201, 169, 110, 0.55); outline-offset: 4px; border-radius: 4px; }
 
+    /* ---------- CHIP TABS ---------- */
+    .chip-tabs {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px;
+      border-radius: 12px;
+    }
+    .chip-tab {
+      position: relative;
+      z-index: 1;
+      padding: 7px 14px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      font-size: 14.5px;
+      line-height: 1;
+      color: #0B0F19;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      white-space: nowrap;
+    }
+    .chip-tab:hover { color: #A88B54; }
+    .chip-tab.active { color: #F7F5F0; }
+    .chip-tab.active:hover { color: #F7F5F0; }
+    .chip-tab:focus-visible { outline: 2px solid rgba(201, 169, 110, 0.55); outline-offset: 2px; }
+    .chip-tab-pill {
+      position: absolute;
+      top: 4px;
+      left: 0;
+      height: calc(100% - 8px);
+      width: 0;
+      background: linear-gradient(135deg, #C9A96E 0%, #A88B54 100%);
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(201, 169, 110, 0.38), inset 0 1px 0 rgba(255,255,255,0.22);
+      z-index: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: left 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+
     /* ---------- ICON BOX ---------- */
     .icon-box {
       width: 52px;
@@ -622,11 +664,14 @@
           </span>
         </a>
 
-        <div style="display: none; align-items: center; gap: 28px;" class="desktop-nav">
-          <a href="#services" class="nav-link" data-i18n="nav.services">Services</a>
-          <a href="#work" class="nav-link" data-i18n="nav.work">Work</a>
-          <a href="#approach" class="nav-link" data-i18n="nav.approach">Approach</a>
-          <a href="#about" class="nav-link" data-i18n="nav.about">About</a>
+        <div style="display: none; align-items: center; gap: 20px;" class="desktop-nav">
+          <div class="chip-tabs" role="tablist">
+            <span class="chip-tab-pill" aria-hidden="true"></span>
+            <a href="#services" class="chip-tab" data-i18n="nav.services">Services</a>
+            <a href="#work" class="chip-tab" data-i18n="nav.work">Work</a>
+            <a href="#approach" class="chip-tab" data-i18n="nav.approach">Approach</a>
+            <a href="#about" class="chip-tab" data-i18n="nav.about">About</a>
+          </div>
           <div class="lang-switch" role="group" aria-label="Language">
             <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
             <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
@@ -1652,6 +1697,71 @@
       if (window.scrollY > 10) nav.classList.add('scrolled');
       else nav.classList.remove('scrolled');
     }, { passive: true });
+
+    // Chip tabs: sliding pill + scroll spy
+    (function initChipTabs() {
+      const chipTabs = document.querySelector('.chip-tabs');
+      if (!chipTabs) return;
+      const pill = chipTabs.querySelector('.chip-tab-pill');
+      const tabs = Array.from(chipTabs.querySelectorAll('.chip-tab'));
+      const sections = tabs
+        .map(tab => ({ tab, section: document.getElementById(tab.getAttribute('href').slice(1)) }))
+        .filter(x => x.section);
+
+      let userOverride = null;
+      let overrideTimer = null;
+
+      function movePill(tab, animate) {
+        if (!tab) { pill.style.opacity = '0'; return; }
+        const tabRect = tab.getBoundingClientRect();
+        const parentRect = chipTabs.getBoundingClientRect();
+        if (animate === false) {
+          const prev = pill.style.transition;
+          pill.style.transition = 'none';
+          pill.style.left = (tabRect.left - parentRect.left) + 'px';
+          pill.style.width = tabRect.width + 'px';
+          pill.offsetHeight;
+          pill.style.transition = prev;
+        } else {
+          pill.style.left = (tabRect.left - parentRect.left) + 'px';
+          pill.style.width = tabRect.width + 'px';
+        }
+        pill.style.opacity = '1';
+        tabs.forEach(t => t.classList.toggle('active', t === tab));
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          userOverride = tab;
+          movePill(tab, true);
+          clearTimeout(overrideTimer);
+          overrideTimer = setTimeout(() => { userOverride = null; }, 900);
+        });
+      });
+
+      function updateActiveSection() {
+        if (userOverride) return;
+        const y = window.scrollY + 140;
+        let current = null;
+        for (const { tab, section } of sections) {
+          if (y >= section.offsetTop) current = tab;
+        }
+        if (current) movePill(current, true);
+        else {
+          pill.style.opacity = '0';
+          tabs.forEach(t => t.classList.remove('active'));
+        }
+      }
+
+      window.addEventListener('scroll', updateActiveSection, { passive: true });
+      window.addEventListener('resize', () => {
+        const active = chipTabs.querySelector('.chip-tab.active');
+        if (active) movePill(active, false);
+      });
+
+      // Delay initial placement so fonts/layout settle
+      requestAnimationFrame(() => requestAnimationFrame(updateActiveSection));
+    })();
 
     // Card spotlight follow cursor
     document.querySelectorAll('.card').forEach(card => {

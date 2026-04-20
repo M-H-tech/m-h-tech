@@ -5,7 +5,11 @@
       "Bash(curl *)",
       "Bash(kill %1)",
       "Bash(pkill -f \"node serve.mjs\")",
-      "Bash(netstat -lnt)"
+      "Bash(netstat -lnt)",
+      "Read(//Users/manuel/Desktop/**)",
+      "Bash(H/our_website/)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
