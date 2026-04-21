@@ -3371,10 +3371,10 @@
           if (offset > N / 2) offset -= N;
 
           const abs = Math.abs(offset);
-          const x = offset * 300;              // horizontal spacing
-          const z = -abs * 220;                // push back when off-center
-          const rotY = -offset * 38;           // tilt inward toward center
-          const opacity = abs === 0 ? 1 : abs === 1 ? 0.38 : abs === 2 ? 0.14 : 0;
+          const x = abs <= 1 ? offset * 300 : 0;     // keep far card hidden behind center for symmetry
+          const z = abs <= 1 ? -abs * 220 : -900;    // push far card deep behind
+          const rotY = abs <= 1 ? -offset * 38 : 0;  // no tilt for the hidden back card
+          const opacity = abs === 0 ? 1 : abs === 1 ? 0.38 : 0;
           const zIndex = 100 - abs;
 
           cards[i].style.transform =
