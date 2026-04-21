@@ -9,7 +9,8 @@
       "Read(//Users/manuel/Desktop/**)",
       "Bash(H/our_website/)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(H/our_website/index.html)"
     ]
   }
 }

@@ -6,10 +6,17 @@
   <title>M&H Tech · Software studio building apps & websites that move the needle</title>
   <meta name="description" content="M&H Tech is a Switzerland-based software studio. We design and build apps, websites, and internal tools for ambitious companies. Founded by two EPFL computer science engineers." />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet" />
 
+  <script>
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    window.scrollTo(0, 0);
+    window.addEventListener('load', () => window.scrollTo(0, 0));
+  </script>
   <script>
     tailwind.config = {
       theme: {
@@ -291,46 +298,93 @@
     .nav-link:hover::after { width: 100%; }
     .nav-link:focus-visible { outline: 2px solid rgba(201, 169, 110, 0.55); outline-offset: 4px; border-radius: 4px; }
 
-    /* ---------- CHIP TABS ---------- */
+    /* ---------- HOVER-GRADIENT NAV (3D flip + radial glow) ---------- */
     .chip-tabs {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 2px;
-      padding: 4px;
-      border-radius: 12px;
+      gap: 4px;
+      padding: 6px;
+      border: 1px solid rgba(11, 15, 25, 0.1);
+      background: rgba(250, 248, 243, 0.85);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(11, 15, 25, 0.06);
+      isolation: isolate;
     }
     .chip-tab {
       position: relative;
-      z-index: 1;
-      padding: 7px 14px;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 500;
-      font-size: 14.5px;
-      line-height: 1;
-      color: #0B0F19;
+      overflow: visible;
+      perspective: 600px;
+      border-radius: 14px;
       text-decoration: none;
-      border-radius: 8px;
-      transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-      white-space: nowrap;
+      color: #334155;
+      display: inline-block;
+      transition: color 0.3s ease;
     }
-    .chip-tab:hover { color: #A88B54; }
-    .chip-tab.active { color: #F7F5F0; }
-    .chip-tab.active:hover { color: #F7F5F0; }
-    .chip-tab:focus-visible { outline: 2px solid rgba(201, 169, 110, 0.55); outline-offset: 2px; }
-    .chip-tab-pill {
+    .chip-tab:hover { color: #0B0F19; }
+    .chip-tab:focus-visible {
+      outline: 2px solid rgba(201, 169, 110, 0.6);
+      outline-offset: 4px;
+      border-radius: 14px;
+    }
+    .chip-tab-glow {
       position: absolute;
-      top: 4px;
-      left: 0;
-      height: calc(100% - 8px);
-      width: 0;
-      background: linear-gradient(135deg, #C9A96E 0%, #A88B54 100%);
-      border-radius: 8px;
-      box-shadow: 0 6px 18px rgba(201, 169, 110, 0.38), inset 0 1px 0 rgba(255,255,255,0.22);
+      inset: -4px;
       z-index: 0;
+      border-radius: 22px;
       opacity: 0;
+      transform: scale(0.8);
       pointer-events: none;
-      transition: left 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      transition:
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .chip-tab-face {
+      position: relative;
+      z-index: 10;
+      display: block;
+      padding: 9px 18px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 12.5px;
+      line-height: 1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: inherit;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transition:
+        transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1),
+        opacity 0.35s ease;
+    }
+    .chip-tab-front { transform-origin: center bottom; }
+    .chip-tab-back {
+      position: absolute;
+      inset: 0;
+      transform: rotateX(90deg);
+      transform-origin: center top;
+      opacity: 0;
+    }
+    .chip-tab:hover .chip-tab-front {
+      transform: rotateX(-90deg);
+      opacity: 0;
+    }
+    .chip-tab:hover .chip-tab-back {
+      transform: rotateX(0deg);
+      opacity: 1;
+    }
+    .chip-tab:hover .chip-tab-glow {
+      opacity: 1;
+      transform: scale(2);
+    }
+    .chip-tab.active { color: #0B0F19; }
+    .chip-tab.active .chip-tab-glow {
+      opacity: 0.55;
+      transform: scale(1.35);
     }
 
     /* ---------- ICON BOX ---------- */
@@ -392,18 +446,653 @@
     .marquee-fade.left { left: 0; background: linear-gradient(90deg, #F7F5F0, transparent); }
     .marquee-fade.right { right: 0; background: linear-gradient(-90deg, #F7F5F0, transparent); }
 
-    /* ---------- PROCESS TIMELINE ---------- */
-    .step-line {
-      position: absolute;
-      top: 32px;
-      left: calc(50% + 40px);
-      right: calc(-50% + 40px);
-      height: 2px;
-      background: linear-gradient(90deg, rgba(201, 169, 110, 0.55), rgba(201, 169, 110, 0.08));
-      z-index: 0;
+    /* ---------- CASE STUDY CIRCULAR GALLERY ---------- */
+    .cases-section {
+      position: relative;
+      min-height: 100vh;
+      background: #0B0F19;
+      overflow: visible;
+      isolation: isolate;
     }
+    .cases-sticky {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      background: #0B0F19;
+    }
+    .cases-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(900px 600px at 50% 115%, rgba(201, 169, 110, 0.22), transparent 70%),
+        radial-gradient(700px 500px at 12% 15%, rgba(201, 169, 110, 0.10), transparent 65%),
+        radial-gradient(600px 420px at 92% 8%, rgba(217, 185, 134, 0.08), transparent 70%),
+        linear-gradient(180deg, #0B0F19 0%, #0F1421 55%, #0B0F19 100%);
+    }
+    .cases-grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.045;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
+    }
+    .cases-sticky::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      top: 0;
+      height: 140px;
+      background: linear-gradient(180deg, rgba(247,245,240,0.06) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .cases-inner {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 72px 24px 36px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+    .cases-head {
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .cases-head .section-marker .num { color: #C9A96E; }
+    .cases-head .section-marker .rule { background: rgba(201, 169, 110, 0.35); }
+    .cases-head .section-marker .label { color: rgba(247, 245, 240, 0.72); }
+    .cases-head .section-heading {
+      color: #F7F5F0;
+    }
+    .cases-sub {
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(247, 245, 240, 0.62);
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cases-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1900px;
+      perspective-origin: 50% 48%;
+      min-height: 0;
+    }
+    .cases-floor {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1080px;
+      max-width: 110%;
+      height: 520px;
+      transform: translate(-50%, 12%) rotateX(68deg);
+      transform-style: preserve-3d;
+      pointer-events: none;
+      background:
+        radial-gradient(closest-side, rgba(201,169,110,0.18), rgba(201,169,110,0) 72%);
+      opacity: 0.8;
+      filter: blur(2px);
+    }
+    .cases-stage::before {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 1px dashed rgba(201, 169, 110, 0.45);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .cases-stage::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 880px; height: 880px;
+      max-width: 120%;
+      max-height: 120%;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 169, 110, 0.08);
+      transform: translate(-50%, -50%) rotateX(72deg);
+      pointer-events: none;
+    }
+
+    .cases-ring {
+      --card-w: 340px;
+      --card-h: 460px;
+      --card-step: 240px;
+      position: relative;
+      width: var(--card-w);
+      height: var(--card-h);
+      transform-style: preserve-3d;
+    }
+    @media (min-width: 1280px) {
+      .cases-ring { --card-w: 360px; --card-h: 480px; --card-step: 260px; }
+    }
+    @media (max-width: 720px) {
+      .cases-ring { --card-w: 260px; --card-h: 360px; --card-step: 180px; }
+    }
+    @media (max-width: 480px) {
+      .cases-ring { --card-w: 230px; --card-h: 320px; --card-step: 160px; }
+    }
+
+    .case-card {
+      position: absolute;
+      top: 0; left: 50%;
+      width: var(--card-w);
+      height: var(--card-h);
+      margin-left: calc(var(--card-w) / -2);
+      border-radius: 22px;
+      overflow: hidden;
+      text-decoration: none;
+      color: white;
+      display: block;
+      backface-visibility: hidden;
+      transform-origin: center center;
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        0 30px 60px -18px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(201, 169, 110, 0.14) inset;
+      isolation: isolate;
+      transition: transform 900ms cubic-bezier(0.7, 0, 0.25, 1), opacity 700ms cubic-bezier(0.7, 0, 0.25, 1);
+      will-change: transform, opacity;
+    }
+
+    /* Navigation arrows */
+    .cases-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(11, 15, 25, 0.55);
+      border: 1px solid rgba(201, 169, 110, 0.35);
+      color: #E4C694;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: background 220ms ease, border-color 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .cases-nav:hover { background: rgba(201, 169, 110, 0.18); border-color: rgba(201, 169, 110, 0.6); transform: translateY(-50%) scale(1.06); }
+    .cases-nav:focus-visible { outline: 2px solid rgba(201, 169, 110, 0.7); outline-offset: 3px; }
+    .cases-nav.prev { left: 24px; }
+    .cases-nav.next { right: 24px; }
+    @media (max-width: 720px) {
+      .cases-nav { width: 44px; height: 44px; }
+      .cases-nav.prev { left: 12px; }
+      .cases-nav.next { right: 12px; }
+    }
+    .case-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .case-card-visual {
+      position: absolute;
+      inset: 0;
+      transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+    .case-card:hover .case-card-visual { transform: scale(1.04); }
+    .case-card-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mix-blend-mode: overlay;
+      opacity: 0.6;
+    }
+    .case-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(11, 15, 25, 0) 0%,
+        rgba(11, 15, 25, 0.15) 40%,
+        rgba(11, 15, 25, 0.78) 82%,
+        rgba(11, 15, 25, 0.96) 100%
+      );
+      pointer-events: none;
+    }
+    .case-card-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px;
+    }
+    .case-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .case-card-case {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #C9A96E;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(11, 15, 25, 0.45);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(201, 169, 110, 0.38);
+    }
+    .case-card-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .case-card-content {
+      position: relative;
+      z-index: 2;
+    }
+    .case-card-content h3 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 21px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: white;
+      margin: 0 0 10px;
+    }
+    @media (min-width: 1024px) {
+      .case-card-content h3 { font-size: 23px; }
+    }
+    .case-card-content p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.78);
+      margin: 0 0 18px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .case-card-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      color: #E8D9B8;
+      letter-spacing: 0.01em;
+    }
+    .case-card-more svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .case-card:hover .case-card-more svg { transform: translateX(4px); }
+
+    /* Active card glow when it faces viewer */
+    .case-card.is-front::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(140deg, rgba(201,169,110,0.85), rgba(201,169,110,0.1) 45%, rgba(201,169,110,0) 60%, rgba(201,169,110,0.55) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
+      z-index: 4;
+      opacity: 1;
+      transition: opacity 320ms ease;
+    }
+
+    /* Individual card themes (backgrounds) */
+    .case-theme-1 { background:
+      radial-gradient(60% 70% at 25% 25%, rgba(201, 169, 110, 0.55), transparent 65%),
+      radial-gradient(70% 80% at 90% 90%, rgba(20, 26, 40, 0.9), transparent 60%),
+      linear-gradient(135deg, #1a2235 0%, #0B0F19 100%);
+    }
+    .case-theme-2 { background:
+      radial-gradient(50% 60% at 85% 20%, rgba(217, 185, 134, 0.45), transparent 70%),
+      radial-gradient(60% 70% at 15% 90%, rgba(201, 169, 110, 0.25), transparent 65%),
+      linear-gradient(160deg, #111827 0%, #0B0F19 60%, #080B12 100%);
+    }
+    .case-theme-3 { background:
+      radial-gradient(55% 65% at 50% 25%, rgba(201, 169, 110, 0.40), transparent 70%),
+      linear-gradient(180deg, #0F1421 0%, #0B0F19 100%);
+    }
+    .case-theme-4 { background:
+      radial-gradient(70% 70% at 20% 85%, rgba(217, 185, 134, 0.35), transparent 65%),
+      radial-gradient(45% 55% at 80% 25%, rgba(168, 139, 84, 0.45), transparent 70%),
+      linear-gradient(135deg, #0F1624 0%, #0B0F19 70%, #060811 100%);
+    }
+
+    /* Glyph layer */
+    .case-glyph {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .case-glyph svg {
+      width: 72%;
+      height: auto;
+      max-height: 62%;
+    }
+
+    /* Indicator / footer */
+    .cases-indicator {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 0 4px;
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .cases-indicator-meta {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .cases-counter {
+      color: #C9A96E;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+    }
+    .cases-hint {
+      color: rgba(247, 245, 240, 0.42);
+    }
+    .cases-indicator-bar {
+      grid-column: 1 / 2;
+      position: relative;
+      height: 2px;
+      background: rgba(247, 245, 240, 0.10);
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .cases-indicator-fill {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #C9A96E 0%, #E4C694 60%, #C9A96E 100%);
+      box-shadow: 0 0 12px rgba(201, 169, 110, 0.45);
+      transition: width 120ms linear;
+    }
+    .cases-indicator-pills {
+      grid-column: 2 / 3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cases-pill {
+      width: 22px;
+      height: 2px;
+      border-radius: 2px;
+      border: none;
+      background: rgba(247, 245, 240, 0.18);
+      padding: 0;
+      cursor: pointer;
+      transition: background-color 220ms ease, width 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+    }
+    .cases-pill:hover { background: rgba(201, 169, 110, 0.55); }
+    .cases-pill.active {
+      background: #C9A96E;
+      width: 42px;
+      box-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
+    }
+
+    @media (max-width: 720px) {
+      .cases-inner { padding: 56px 18px 28px; gap: 12px; }
+      .cases-indicator { gap: 14px; }
+    }
+
+    /* ---------- PHASES DIAGRAM ---------- */
+    .phases-diagram {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .phases-hub {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .phases-hub-dashed {
+      width: 116px;
+      height: 116px;
+      border: 1.5px dashed rgba(201, 169, 110, 0.55);
+      border-radius: 22px;
+      padding: 10px;
+      background:
+        radial-gradient(60% 60% at 50% 40%, rgba(201, 169, 110, 0.10), transparent 70%);
+      position: relative;
+    }
+    .phases-hub-dashed::before,
+    .phases-hub-dashed::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 26px;
+      border: 1px solid rgba(201, 169, 110, 0.14);
+      pointer-events: none;
+    }
+    .phases-hub-dashed::after {
+      inset: -10px;
+      border-color: rgba(201, 169, 110, 0.07);
+      border-radius: 30px;
+    }
+    .phases-hub-core {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #D9B986 0%, #C9A96E 48%, #A88B54 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-size: 22px;
+      box-shadow:
+        0 14px 32px rgba(201, 169, 110, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        inset 0 -1px 0 rgba(11, 15, 25, 0.12);
+    }
+    .phases-hub-core span { transform: translateY(-1px); }
+    .phases-hub-label {
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #A88B54;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(201, 169, 110, 0.08);
+      border: 1px solid rgba(201, 169, 110, 0.18);
+    }
+
+    .phases-wire-svg {
+      width: 100%;
+      max-width: 960px;
+      height: 88px;
+      display: block;
+      margin: 0 auto;
+      overflow: visible;
+    }
+    .phases-line {
+      stroke: #C9A96E;
+      stroke-width: 1.25;
+      fill: none;
+      stroke-linecap: square;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 120ms linear;
+    }
+    .phases-node {
+      fill: #C9A96E;
+      opacity: 0;
+      transform: scale(0);
+      transform-origin: center;
+      transform-box: fill-box;
+      transition: opacity 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .phases-line { stroke-dashoffset: 0 !important; transition: none !important; }
+      .phases-node { opacity: 1 !important; transform: scale(1) !important; transition: none !important; }
+    }
+
+    .phases-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .phase-card {
+      position: relative;
+      background: white;
+      border: 1px solid rgba(232, 227, 216, 0.85);
+      border-radius: 16px;
+      padding: 32px 26px 28px;
+      text-align: center;
+      box-shadow:
+        0 1px 3px rgba(11, 15, 25, 0.04),
+        0 14px 40px -12px rgba(11, 15, 25, 0.10);
+    }
+    .phase-corner {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: #C9A96E;
+      border-radius: 1.5px;
+      box-shadow: 0 0 0 2px #F7F5F0;
+    }
+    .phase-corner-tl { top: -4px; left: -4px; }
+    .phase-corner-tr { top: -4px; right: -4px; }
+    .phase-corner-bl { bottom: -4px; left: -4px; }
+    .phase-corner-br { bottom: -4px; right: -4px; }
+    .phase-num {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: #A88B54;
+      background: rgba(201, 169, 110, 0.09);
+      border: 1px solid rgba(201, 169, 110, 0.22);
+      padding: 5px 11px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+    .phase-num::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      background: #C9A96E;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.12);
+    }
+    .phase-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: #0B0F19;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+    .phase-card p {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #334155;
+      margin: 0;
+    }
+
+    .phases-wire-mobile {
+      display: none;
+    }
+
     @media (max-width: 767px) {
-      .step-line { display: none; }
+      .phases-wire-svg { display: none; }
+      .phases-cards { grid-template-columns: 1fr; gap: 44px; max-width: 420px; }
+      .phase-card { padding: 28px 22px 24px; }
+      .phases-hub-dashed { width: 96px; height: 96px; border-radius: 18px; }
+      .phases-hub-core { border-radius: 12px; font-size: 18px; }
+      .phases-wire-mobile {
+        display: block;
+        width: 1.5px;
+        height: 36px;
+        background: linear-gradient(180deg, #C9A96E, rgba(201, 169, 110, 0.4));
+        margin: 14px auto 0;
+      }
+      .phases-cards {
+        position: relative;
+      }
+      .phases-cards::before {
+        content: "";
+        position: absolute;
+        top: -36px;
+        bottom: -36px;
+        left: 50%;
+        width: 1.5px;
+        background: repeating-linear-gradient(
+          180deg,
+          rgba(201, 169, 110, 0.5) 0,
+          rgba(201, 169, 110, 0.5) 6px,
+          transparent 6px,
+          transparent 12px
+        );
+        transform: translateX(-50%);
+        z-index: 0;
+      }
+      .phase-card { position: relative; z-index: 1; }
     }
 
     /* ---------- MOBILE MENU ---------- */
@@ -535,6 +1224,90 @@
     }
     .hero-word.in { opacity: 1; transform: translateY(0); }
 
+    /* ---------- AURORA HERO ---------- */
+    .hero-aurora {
+      background: #05070e;
+      isolation: isolate;
+    }
+    .aurora-mount {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .aurora-mount canvas {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      display: block !important;
+    }
+    /* soft vignette + fade into cream for the section below */
+    .aurora-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 120% 95% at 50% 50%, transparent 35%, rgba(5, 7, 14, 0.28) 100%),
+        linear-gradient(to bottom, transparent 0%, transparent 76%, rgba(247, 245, 240, 0.35) 94%, #F7F5F0 100%);
+    }
+    /* subtle left-side copy scrim so text stays crisp over bright aurora streaks */
+    .aurora-text-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(100deg, rgba(5, 7, 14, 0.42) 0%, rgba(5, 7, 14, 0.18) 48%, transparent 78%);
+    }
+    /* dark treatment for hero content */
+    .hero-aurora .noise::before { opacity: 0.05; mix-blend-mode: screen; z-index: 1; }
+    .hero-aurora h1,
+    .hero-aurora .hero-word { color: #FAF8F3 !important; }
+    .hero-aurora .serif-accent { color: #C9A96E !important; }
+    .hero-aurora [style*="color: #0B0F19"] { color: #FAF8F3 !important; }
+    .hero-aurora [style*="color: #334155"] { color: rgba(250, 248, 243, 0.82) !important; }
+    .hero-aurora [style*="color: #64748B"] { color: rgba(250, 248, 243, 0.55) !important; }
+    .hero-aurora .pill {
+      background: rgba(250, 248, 243, 0.06) !important;
+      border: 1px solid rgba(201, 169, 110, 0.32) !important;
+      color: #FAF8F3 !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 2px 18px rgba(201, 169, 110, 0.12);
+    }
+    .hero-aurora .btn-primary {
+      background: linear-gradient(135deg, #D9B986 0%, #C9A96E 100%) !important;
+      color: #0B0F19 !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.28) inset,
+        0 10px 32px rgba(201, 169, 110, 0.32),
+        0 2px 6px rgba(11, 15, 25, 0.4) !important;
+    }
+    .hero-aurora .btn-primary:hover {
+      background: linear-gradient(135deg, #E4C694 0%, #D0B479 100%) !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.32) inset,
+        0 16px 44px rgba(201, 169, 110, 0.44),
+        0 3px 10px rgba(11, 15, 25, 0.44) !important;
+    }
+    .hero-aurora .btn-primary::after {
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent) !important;
+    }
+    .hero-aurora .btn-secondary {
+      background: rgba(250, 248, 243, 0.06) !important;
+      color: #FAF8F3 !important;
+      border: 1px solid rgba(250, 248, 243, 0.18) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .hero-aurora .btn-secondary:hover {
+      background: rgba(250, 248, 243, 0.10) !important;
+      border-color: rgba(201, 169, 110, 0.55) !important;
+    }
+
     /* ---------- PILL BADGE ---------- */
     .pill {
       display: inline-flex;
@@ -604,6 +1377,136 @@
       margin: 8px 2px 4px;
     }
 
+    /* ---------- LANGUAGE DROPDOWN (desktop nav) ---------- */
+    .lang-dropdown {
+      position: relative;
+      font-family: 'Outfit', sans-serif;
+    }
+    .lang-dropdown-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(11, 15, 25, 0.1);
+      border-radius: 100px;
+      padding: 7px 10px 7px 14px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 12.5px;
+      color: #0B0F19;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 1px 2px rgba(11, 15, 25, 0.03) inset, 0 2px 8px rgba(11, 15, 25, 0.04);
+      transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+    }
+    .lang-dropdown-trigger:hover {
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 10px rgba(11, 15, 25, 0.06);
+    }
+    .lang-dropdown-trigger:focus-visible {
+      outline: 2px solid rgba(201, 169, 110, 0.55);
+      outline-offset: 2px;
+    }
+    .lang-dropdown-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #C9A96E, #A88B54);
+      color: white;
+      box-shadow: 0 1px 2px rgba(201, 169, 110, 0.35);
+    }
+    .lang-dropdown-name { font-size: 12.5px; color: #0B0F19; }
+    .lang-dropdown-chev {
+      color: #64748B;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .lang-dropdown.open .lang-dropdown-chev { transform: rotate(-180deg); color: #0B0F19; }
+    .lang-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 172px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border: 1px solid rgba(11, 15, 25, 0.08);
+      border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(11, 15, 25, 0.12), 0 2px 6px rgba(11, 15, 25, 0.06);
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+      transform-origin: top right;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 50;
+    }
+    .lang-dropdown.open .lang-dropdown-menu {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .lang-dropdown-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      background: transparent;
+      border: none;
+      border-radius: 9px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+    .lang-dropdown-option:hover { background: rgba(201, 169, 110, 0.08); color: #0B0F19; }
+    .lang-dropdown-option:focus-visible {
+      outline: 2px solid rgba(201, 169, 110, 0.55);
+      outline-offset: -2px;
+    }
+    .lang-dropdown-option-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 6px;
+      background: rgba(11, 15, 25, 0.05);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #64748B;
+      letter-spacing: 0.08em;
+    }
+    .lang-dropdown-option[aria-selected="true"] .lang-dropdown-option-code {
+      background: linear-gradient(135deg, #C9A96E, #A88B54);
+      color: white;
+      box-shadow: 0 1px 2px rgba(201, 169, 110, 0.35);
+    }
+    .lang-dropdown-option-name { flex: 1; }
+    .lang-dropdown-check {
+      color: #C9A96E;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+    .lang-dropdown-option[aria-selected="true"] .lang-dropdown-check { opacity: 1; }
+    .lang-dropdown-option[aria-selected="true"] { color: #0B0F19; }
+
     /* ---------- RESPONSIVE ---------- */
     @media (min-width: 768px) {
       .desktop-nav { display: flex !important; }
@@ -645,6 +1548,352 @@
       transform: translateX(-50%) translateY(0);
     }
     .toast svg { flex-shrink: 0; }
+
+    /* ============================================================
+       DARK MODE — global palette flip
+       Ink-first surfaces with gold as the single warm accent.
+       ============================================================ */
+    body {
+      background: #07090F !important;
+      color: #F2ECDC;
+    }
+    ::selection { background: rgba(201, 169, 110, 0.35); color: #FAF8F3; }
+
+    /* Surface tokens — layered dark */
+    :root {
+      --dark-base: #07090F;
+      --dark-raised: #0E1220;
+      --dark-floating: #151A2B;
+      --dark-line: rgba(201, 169, 110, 0.14);
+      --dark-line-strong: rgba(201, 169, 110, 0.28);
+      --text-primary: #FAF8F3;
+      --text-secondary: rgba(250, 248, 243, 0.68);
+      --text-tertiary: rgba(250, 248, 243, 0.45);
+    }
+
+    /* Navigation — dark glass */
+    .nav {
+      background: rgba(8, 10, 18, 0.72) !important;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.12) !important;
+    }
+    .nav.scrolled {
+      background: rgba(8, 10, 18, 0.92) !important;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
+    }
+    .nav-link { color: #F2ECDC !important; }
+    .nav-link:hover { color: #E4C694 !important; }
+    .nav [style*="color: #0B0F19"] { color: #FAF8F3 !important; }
+    .mobile-toggle span { background: #F2ECDC !important; }
+
+    /* Chip tabs (desktop nav) — dark glass */
+    .chip-tabs {
+      border: 1px solid rgba(201, 169, 110, 0.18) !important;
+      background: rgba(14, 18, 32, 0.65) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+    }
+    .chip-tab { color: rgba(242, 236, 220, 0.62) !important; }
+    .chip-tab:hover { color: #F2ECDC !important; }
+    .chip-tab.active { color: #F2ECDC !important; }
+
+    /* Language dropdown — dark */
+    .lang-dropdown-trigger {
+      background: rgba(14, 18, 32, 0.65) !important;
+      border: 1px solid rgba(201, 169, 110, 0.18) !important;
+      color: #F2ECDC !important;
+    }
+    .lang-dropdown-trigger:hover { background: rgba(21, 26, 43, 0.9) !important; }
+    .lang-dropdown-name { color: #F2ECDC !important; }
+    .lang-dropdown-chev { color: rgba(242, 236, 220, 0.6) !important; }
+    .lang-dropdown.open .lang-dropdown-chev { color: #E4C694 !important; }
+    .lang-dropdown-menu {
+      background: rgba(14, 18, 32, 0.96) !important;
+      border: 1px solid rgba(201, 169, 110, 0.2) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+    }
+    .lang-dropdown-option { color: rgba(242, 236, 220, 0.72) !important; }
+    .lang-dropdown-option:hover {
+      background: rgba(201, 169, 110, 0.1) !important;
+      color: #FAF8F3 !important;
+    }
+    .lang-dropdown-option-code {
+      background: rgba(242, 236, 220, 0.06) !important;
+      color: rgba(242, 236, 220, 0.6) !important;
+    }
+    .lang-dropdown-option[aria-selected="true"] { color: #FAF8F3 !important; }
+    .lang-dropdown-option[aria-selected="true"] .lang-dropdown-option-code {
+      background: linear-gradient(135deg, #C9A96E, #A88B54) !important;
+      color: #07090F !important;
+    }
+
+    /* Typography on dark */
+    .section-heading { color: #FAF8F3 !important; }
+    .grad-text {
+      background: linear-gradient(135deg, #C9A96E 0%, #FAF8F3 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+    }
+    .serif-accent { color: #E4C694 !important; }
+    .section-marker { color: #F2ECDC !important; }
+    .section-marker .num { color: #E4C694 !important; }
+    .section-marker .rule {
+      background: linear-gradient(90deg, rgba(201, 169, 110, 0.35), transparent) !important;
+    }
+    .section-marker .label { color: rgba(242, 236, 220, 0.6) !important; }
+    .eyebrow-mono { color: rgba(242, 236, 220, 0.5) !important; }
+
+    /* Grid background (approach section) — dark */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(201, 169, 110, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201, 169, 110, 0.05) 1px, transparent 1px) !important;
+    }
+
+    /* Cards — dark raised surface */
+    .card {
+      background: linear-gradient(180deg, #121728 0%, #0D1120 100%) !important;
+      border: 1px solid rgba(201, 169, 110, 0.14) !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        0 18px 40px rgba(0, 0, 0, 0.35) !important;
+      color: #F2ECDC;
+    }
+    .card:hover {
+      border-color: rgba(201, 169, 110, 0.42) !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 28px 56px rgba(0, 0, 0, 0.45) !important;
+    }
+    .card::before {
+      background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 0%), rgba(201, 169, 110, 0.18), transparent 40%) !important;
+    }
+    .card h3 { color: #FAF8F3 !important; }
+
+    /* Text color inline overrides (inline styles use #0B0F19, #334155, #64748B) */
+    [style*="color: #0B0F19"] { color: #FAF8F3 !important; }
+    [style*="color:#0B0F19"] { color: #FAF8F3 !important; }
+    [style*="color: #334155"] { color: rgba(242, 236, 220, 0.7) !important; }
+    [style*="color:#334155"] { color: rgba(242, 236, 220, 0.7) !important; }
+    [style*="color: #64748B"] { color: rgba(242, 236, 220, 0.48) !important; }
+    [style*="color:#64748B"] { color: rgba(242, 236, 220, 0.48) !important; }
+    [style*="color: #A88B54"] { color: #E4C694 !important; }
+
+    /* Background inline overrides for the cream sections */
+    [style*="background: #F7F5F0"] { background: transparent !important; }
+    [style*="background: #FAF8F3"] { background: transparent !important; }
+    [style*="background: linear-gradient(180deg, #F7F5F0 0%, #FAF8F3 100%)"] {
+      background: linear-gradient(180deg, #07090F 0%, #0B0F1C 100%) !important;
+    }
+
+    /* Pill badge — dark */
+    .pill {
+      background: rgba(201, 169, 110, 0.06) !important;
+      border: 1px solid rgba(201, 169, 110, 0.3) !important;
+      color: #F2ECDC !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 2px 18px rgba(201, 169, 110, 0.1);
+    }
+
+    /* Primary & secondary CTAs — elevated gold primary on dark */
+    .btn-primary {
+      background: linear-gradient(135deg, #D9B986 0%, #C9A96E 100%) !important;
+      color: #07090F !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.28) inset,
+        0 10px 30px rgba(201, 169, 110, 0.32),
+        0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #E4C694 0%, #D0B479 100%) !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.32) inset,
+        0 16px 42px rgba(201, 169, 110, 0.44),
+        0 3px 10px rgba(0, 0, 0, 0.55) !important;
+    }
+    .btn-secondary {
+      background: rgba(242, 236, 220, 0.05) !important;
+      color: #F2ECDC !important;
+      border: 1px solid rgba(242, 236, 220, 0.16) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover {
+      background: rgba(242, 236, 220, 0.09) !important;
+      border-color: rgba(201, 169, 110, 0.55) !important;
+    }
+
+    /* Marquee fades — dark */
+    .marquee-fade.left { background: linear-gradient(90deg, #07090F, transparent) !important; }
+    .marquee-fade.right { background: linear-gradient(-90deg, #07090F, transparent) !important; }
+    .marquee > div { color: rgba(242, 236, 220, 0.55) !important; }
+
+    /* Approach section — phase cards dark */
+    .phase-card {
+      background: linear-gradient(180deg, #121728 0%, #0D1120 100%) !important;
+      border: 1px solid rgba(201, 169, 110, 0.14) !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.04) inset,
+        0 14px 40px rgba(0, 0, 0, 0.4) !important;
+    }
+    .phase-corner { box-shadow: 0 0 0 2px #07090F !important; }
+    .phase-card h3 { color: #FAF8F3 !important; }
+    .phase-card p { color: rgba(242, 236, 220, 0.7) !important; }
+
+    /* About section — founders card dark */
+    #about .reveal > div[style*="background: white"] {
+      background: linear-gradient(180deg, #121728 0%, #0D1120 100%) !important;
+      border: 1px solid rgba(201, 169, 110, 0.18) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 20px 48px rgba(0, 0, 0, 0.4) !important;
+    }
+    #about div[style*="position: absolute"][style*="background: white"] {
+      background: linear-gradient(180deg, #151A2B, #0E1220) !important;
+      border: 1px solid rgba(201, 169, 110, 0.22) !important;
+      color: #F2ECDC !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45) !important;
+    }
+
+    /* Scroll-tilt showcase — match dark body */
+    .scroll-tilt { background: #07090F !important; }
+
+    /* Divider borders on dark */
+    [style*="border-top: 1px solid #E8E3D8"] { border-top-color: rgba(201, 169, 110, 0.12) !important; }
+    [style*="border-bottom: 1px solid #E8E3D8"] { border-bottom-color: rgba(201, 169, 110, 0.12) !important; }
+
+    /* Manifesto section quote mark */
+    #manifesto-quote { color: rgba(201, 169, 110, 0.12) !important; }
+
+    /* Make grid-bg fade work on dark */
+    .grid-bg-fade {
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+
+    /* Orbs muted on dark body */
+    .orb-1 { opacity: 0.12 !important; }
+    .orb-2 { opacity: 0.08 !important; background: #151A2B !important; }
+    .orb-3 { opacity: 0.10 !important; }
+
+    /* Case card overlay: already dark-native, keep */
+
+    /* ============================================================
+       HERO — Nexus interactive dot-grid
+       ============================================================ */
+    .hero-nexus {
+      background: radial-gradient(120% 80% at 50% 0%, #0E1328 0%, #07090F 55%, #05060B 100%) !important;
+      isolation: isolate;
+    }
+    #heroDots {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    .hero-nexus-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 120% 95% at 50% 45%, transparent 30%, rgba(5, 6, 11, 0.55) 100%),
+        linear-gradient(to bottom, transparent 0%, transparent 72%, rgba(7, 9, 15, 0.7) 92%, #07090F 100%);
+    }
+
+    /* Shiny pill (hero) */
+    .pill-shiny {
+      position: relative;
+      overflow: hidden;
+    }
+    .pill-shiny::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 30%, rgba(228, 198, 148, 0.28) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: pillShine 3.2s ease-in-out 1.2s infinite;
+      pointer-events: none;
+    }
+    @keyframes pillShine {
+      0% { transform: translateX(-100%); }
+      35%, 100% { transform: translateX(120%); }
+    }
+
+    /* Rotating text (hero) */
+    .hero-rotate-wrap {
+      display: inline-flex;
+      align-items: baseline;
+      vertical-align: baseline;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 0.15em;
+    }
+    .hero-rotate {
+      display: inline-flex;
+      align-items: baseline;
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-variation-settings: "opsz" 144;
+      color: #E4C694;
+      letter-spacing: -0.035em;
+      white-space: nowrap;
+      position: relative;
+    }
+    .hero-rotate-char {
+      display: inline-block;
+      transition: transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 420ms ease;
+      will-change: transform, opacity;
+    }
+    .hero-rotate-char.enter {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    .hero-rotate-char.exit {
+      transform: translateY(-110%);
+      opacity: 0;
+    }
+
+    /* Text Effect (per-word blur fade-in, ported from text-effect.tsx) */
+    .te-word {
+      display: inline-block;
+      white-space: pre;
+      opacity: 0;
+      filter: blur(12px);
+      transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+      transition-delay: var(--te-delay, 0ms);
+      will-change: opacity, filter;
+    }
+    .te-word.in {
+      opacity: 1;
+      filter: blur(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .te-word { transition: none; opacity: 1; filter: none; }
+    }
+
+    /* Hero trust signals on dark */
+    .hero-trust-num {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #FAF8F3;
+    }
+    .hero-trust-label {
+      font-size: 13px;
+      color: rgba(242, 236, 220, 0.5);
+      margin-top: 6px;
+    }
+
+    /* Hide old aurora nodes (safety — they're also removed in HTML) */
+    .aurora-mount, .aurora-text-scrim, .aurora-vignette { display: none !important; }
   </style>
 </head>
 <body>
@@ -653,33 +1902,54 @@
   <nav class="nav" id="nav">
     <div style="max-width: 1240px; margin: 0 auto; padding: 0 24px;">
       <div style="display: flex; align-items: center; justify-content: space-between; height: 74px;">
-        <a href="#" style="display: flex; align-items: center; text-decoration: none; gap: 10px;">
-          <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #C9A96E, #A88B54); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(201, 169, 110, 0.35);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 20V4l8 8 8-8v16"/>
-            </svg>
-          </div>
+        <a href="#" style="display: flex; align-items: center; text-decoration: none;">
           <span style="font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.03em; line-height: 1;">
-            <span style="color: #0B0F19;">M&amp;H</span><span style="color: #C9A96E;">Tech</span>
+            <span style="color: #0B0F19;">M&amp;H</span><span style="color: #C9A96E;"> Tech</span>
           </span>
         </a>
 
         <div style="display: none; align-items: center; gap: 20px;" class="desktop-nav">
           <div class="chip-tabs" role="tablist">
-            <span class="chip-tab-pill" aria-hidden="true"></span>
-            <a href="#services" class="chip-tab" data-i18n="nav.services">Services</a>
-            <a href="#work" class="chip-tab" data-i18n="nav.work">Work</a>
-            <a href="#approach" class="chip-tab" data-i18n="nav.approach">Approach</a>
-            <a href="#about" class="chip-tab" data-i18n="nav.about">About</a>
+            <a href="#services" class="chip-tab">
+              <span class="chip-tab-glow" aria-hidden="true" style="background: radial-gradient(circle, rgba(201,169,110,0.26) 0%, rgba(168,139,84,0.10) 50%, rgba(201,169,110,0) 100%);"></span>
+              <span class="chip-tab-face chip-tab-front" data-i18n="nav.services">Services</span>
+              <span class="chip-tab-face chip-tab-back" data-i18n="nav.services" aria-hidden="true">Services</span>
+            </a>
+            <a href="#work" class="chip-tab">
+              <span class="chip-tab-glow" aria-hidden="true" style="background: radial-gradient(circle, rgba(217,185,134,0.26) 0%, rgba(201,169,110,0.10) 50%, rgba(201,169,110,0) 100%);"></span>
+              <span class="chip-tab-face chip-tab-front" data-i18n="nav.work">Work</span>
+              <span class="chip-tab-face chip-tab-back" data-i18n="nav.work" aria-hidden="true">Work</span>
+            </a>
+            <a href="#approach" class="chip-tab">
+              <span class="chip-tab-glow" aria-hidden="true" style="background: radial-gradient(circle, rgba(168,139,84,0.28) 0%, rgba(133,107,55,0.10) 50%, rgba(168,139,84,0) 100%);"></span>
+              <span class="chip-tab-face chip-tab-front" data-i18n="nav.approach">Approach</span>
+              <span class="chip-tab-face chip-tab-back" data-i18n="nav.approach" aria-hidden="true">Approach</span>
+            </a>
+            <a href="#about" class="chip-tab">
+              <span class="chip-tab-glow" aria-hidden="true" style="background: radial-gradient(circle, rgba(228,198,148,0.26) 0%, rgba(201,169,110,0.08) 50%, rgba(228,198,148,0) 100%);"></span>
+              <span class="chip-tab-face chip-tab-front" data-i18n="nav.about">About</span>
+              <span class="chip-tab-face chip-tab-back" data-i18n="nav.about" aria-hidden="true">About</span>
+            </a>
           </div>
-          <div class="lang-switch" role="group" aria-label="Language">
-            <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
-            <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
+          <div class="lang-dropdown" data-lang-current="en">
+            <button type="button" class="lang-dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="lang-dropdown-code">EN</span>
+              <span class="lang-dropdown-name" data-i18n="lang.en.name">English</span>
+              <svg class="lang-dropdown-chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+            </button>
+            <div class="lang-dropdown-menu" role="listbox" aria-label="Language">
+              <button type="button" class="lang-dropdown-option" data-lang="en" role="option" aria-selected="true">
+                <span class="lang-dropdown-option-code">EN</span>
+                <span class="lang-dropdown-option-name" data-i18n="lang.en.name">English</span>
+                <svg class="lang-dropdown-check" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7.5 6 10.5 11 4"/></svg>
+              </button>
+              <button type="button" class="lang-dropdown-option" data-lang="fr" role="option" aria-selected="false">
+                <span class="lang-dropdown-option-code">FR</span>
+                <span class="lang-dropdown-option-name" data-i18n="lang.fr.name">Français</span>
+                <svg class="lang-dropdown-check" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7.5 6 10.5 11 4"/></svg>
+              </button>
+            </div>
           </div>
-          <a href="#contact" class="btn-primary" style="padding: 10px 20px; font-size: 14px;">
-            <span data-i18n="nav.start">Start a Project</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </a>
         </div>
 
         <button onclick="document.getElementById('mobileMenu').classList.toggle('open')"
@@ -707,30 +1977,34 @@
     </div>
   </nav>
 
-  <!-- ============ HERO ============ -->
-  <section style="position: relative; overflow: hidden; padding-top: 140px; padding-bottom: 80px;" class="noise">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+  <!-- ============ HERO (Nexus — interactive dot grid) ============ -->
+  <section id="home" class="hero-nexus" style="position: relative; overflow: hidden; padding-top: 150px; padding-bottom: 110px;">
+    <canvas id="heroDots" aria-hidden="true"></canvas>
+    <div class="hero-nexus-vignette" aria-hidden="true"></div>
 
-    <div style="position: absolute; inset: 0; z-index: 1;" class="grid-bg grid-bg-fade"></div>
-
-    <div style="position: relative; z-index: 2; max-width: 1240px; margin: 0 auto; padding: 0 24px;">
-      <div style="max-width: 820px; padding: 60px 0 80px;">
+    <div style="position: relative; z-index: 3; max-width: 1240px; margin: 0 auto; padding: 0 24px;">
+      <div style="max-width: 900px; padding: 40px 0 60px;">
         <div class="reveal" style="margin-bottom: 28px;">
-          <span class="pill">
+          <span class="pill pill-shiny">
             <span class="dot"></span>
             <span data-i18n="hero.available">Available for new projects</span>
           </span>
         </div>
-        <h1 class="hero-heading" data-i18n-html="hero.title" style="font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: -0.045em; color: #0B0F19; line-height: 1.02; font-size: clamp(56px, 9vw, 116px); margin-bottom: 32px;">
-          <span class="hero-word">Software</span> <span class="hero-word">that</span><br />
-          <span class="hero-word serif-accent">quietly</span> <span class="hero-word serif-accent">runs</span><br />
-          <span class="hero-word">your</span> <span class="hero-word">business.</span>
+
+        <h1 class="hero-heading" style="font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: -0.045em; color: #FAF8F3; line-height: 1.04; font-size: clamp(52px, 8.6vw, 108px); margin-bottom: 30px;">
+          <span class="hero-word" data-i18n="hero.line1">Software that</span><br />
+          <span class="hero-rotate-wrap" aria-hidden="true">
+            <span class="hero-rotate" id="heroRotate"></span>
+          </span>
+          <span class="sr-only" id="heroRotateSR" aria-live="polite"></span>
+          <br />
+          <span class="hero-word" data-i18n="hero.line3">your business.</span>
         </h1>
-        <p class="reveal" data-i18n="hero.subtitle" style="font-size: 20px; line-height: 1.65; color: #334155; max-width: 640px; margin-bottom: 44px;">
+
+        <p class="reveal" data-i18n="hero.subtitle" style="font-size: 20px; line-height: 1.65; color: rgba(242, 236, 220, 0.68); max-width: 640px; margin-bottom: 44px;">
           We're a two-person engineering studio from Switzerland. We design and build custom apps, websites and internal tools for companies that need real software, not templates.
         </p>
+
         <div class="reveal" style="display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 56px;">
           <a href="#contact" class="btn-primary">
             <span data-i18n="hero.cta.start">Start a project</span>
@@ -744,19 +2018,19 @@
         <!-- Trust signals -->
         <div class="reveal" style="display: flex; flex-wrap: wrap; gap: 36px 48px;">
           <div>
-            <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 28px; color: #0B0F19; letter-spacing: -0.03em; line-height: 1;">EPFL</div>
-            <div style="font-size: 13px; color: #64748B; margin-top: 6px;" data-i18n="hero.trust.founders">Engineering founders</div>
+            <div class="hero-trust-num">EPFL</div>
+            <div class="hero-trust-label" data-i18n="hero.trust.founders">Engineering founders</div>
           </div>
           <div>
-            <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 28px; color: #0B0F19; letter-spacing: -0.03em; line-height: 1;">24h</div>
-            <div style="font-size: 13px; color: #64748B; margin-top: 6px;" data-i18n="hero.trust.reply">Reply guaranteed</div>
+            <div class="hero-trust-num">24h</div>
+            <div class="hero-trust-label" data-i18n="hero.trust.reply">Reply guaranteed</div>
           </div>
           <div>
-            <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 28px; color: #0B0F19; letter-spacing: -0.03em; line-height: 1; display: flex; align-items: center; gap: 8px;">
+            <div class="hero-trust-num" style="display: flex; align-items: center; gap: 8px;">
               <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="4" fill="#DA291C"/><rect x="13" y="7" width="6" height="18" fill="#fff"/><rect x="7" y="13" width="18" height="6" fill="#fff"/></svg>
               CH
             </div>
-            <div style="font-size: 13px; color: #64748B; margin-top: 6px;" data-i18n="hero.trust.based">Based in Switzerland</div>
+            <div class="hero-trust-label" data-i18n="hero.trust.based">Based in Switzerland</div>
           </div>
         </div>
       </div>
@@ -768,7 +2042,7 @@
     <div style="max-width: 1240px; margin: 0 auto; padding: 0 24px; margin-bottom: 28px;">
       <p class="eyebrow-mono" style="text-align: center;" data-i18n="tech.label">The toolkit we build with</p>
     </div>
-    <div style="position: relative; overflow: hidden;">
+    <div style="position: relative; overflow: hidden; max-width: 1240px; margin: 0 auto;">
       <div class="marquee-fade left"></div>
       <div class="marquee-fade right"></div>
       <div class="marquee">
@@ -863,12 +2137,7 @@
   <!-- ============ SERVICES ============ -->
   <section id="services" style="padding: 100px 24px; position: relative;">
     <div style="max-width: 1240px; margin: 0 auto;">
-      <div style="max-width: 680px; margin-bottom: 72px;">
-        <div class="section-marker reveal">
-          <span class="num">01</span>
-          <span class="rule"></span>
-          <span class="label" data-i18n="services.label">Services</span>
-        </div>
+      <div style="max-width: 680px; margin: 0 auto 72px; text-align: center;">
         <h2 class="section-heading reveal" data-i18n-html="services.title" style="font-size: clamp(34px, 4.5vw, 52px); margin-bottom: 20px;">
           Four disciplines.<br />
           <span class="grad-text">One team shipping them.</span>
@@ -947,131 +2216,286 @@
     </div>
   </section>
 
-  <!-- ============ FEATURED WORK / CASE STUDY ============ -->
-  <section id="work" style="padding: 100px 24px; position: relative; background: white;">
-    <div style="max-width: 1240px; margin: 0 auto;">
-      <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 56px;">
-        <div style="max-width: 620px;">
-          <div class="section-marker reveal">
-            <span class="num">02</span>
-            <span class="rule"></span>
-            <span class="label" data-i18n="work.label">Work</span>
-          </div>
-          <h2 class="section-heading reveal" data-i18n="work.title" style="font-size: clamp(34px, 4.5vw, 52px);">
-            A field app for a real-estate team.
-          </h2>
+  <!-- ============ SCROLL-TILT SHOWCASE ============ -->
+  <section class="scroll-tilt" aria-label="Product showcase" style="position: relative; padding: 80px 20px 60px; background: linear-gradient(180deg, #F7F5F0 0%, #FAF8F3 100%);">
+    <div class="scroll-tilt-stage" style="max-width: 1180px; margin: 0 auto; perspective: 1000px;">
+      <div class="scroll-tilt-title" style="max-width: 820px; margin: 0 auto 40px; text-align: center; will-change: transform;">
+        <div class="section-marker" style="justify-content: center;">
+          <span class="num">~</span>
+          <span class="rule" style="max-width: 100px;"></span>
+          <span class="label" data-i18n="showcase.label">Product in motion</span>
+          <span class="rule" style="max-width: 100px;"></span>
         </div>
-        <p class="reveal" data-i18n="work.subtitle" style="font-size: 15px; color: #334155; max-width: 320px;">
-          Built in 12 weeks. Replaced a WhatsApp + paper workflow with one iPhone app used daily.
+        <h2 class="section-heading" style="font-size: clamp(34px, 5.5vw, 66px);" data-i18n-html="showcase.title">
+          Software <span class="serif-accent">people open</span> every day.
+        </h2>
+        <p style="margin-top: 18px; font-size: 16px; line-height: 1.65; color: #334155;" data-i18n="showcase.subtitle">
+          Not decks. Not mockups. Tools your team reaches for on a Monday morning.
         </p>
       </div>
 
-      <div class="case-grid reveal" style="display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; background: linear-gradient(135deg, #FAF8F3 0%, #F2EDE3 100%); border-radius: 32px; padding: 56px 40px; position: relative; overflow: hidden; border: 1px solid #E8E3D8;">
-        <!-- Decorative gradient -->
-        <div style="position: absolute; top: -80px; right: -80px; width: 320px; height: 320px; background: radial-gradient(circle, rgba(201, 169, 110, 0.18), transparent 65%); filter: blur(30px);"></div>
-
-        <!-- LEFT: Copy -->
-        <div style="position: relative; z-index: 2;">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #C9A96E; letter-spacing: 0.12em; text-transform: uppercase;" data-i18n="work.case">Case 01</span>
-            <span style="width: 24px; height: 1px; background: #C9A96E;"></span>
-            <span style="font-size: 13px; color: #64748B;" data-i18n="work.location">Real estate · Geneva</span>
+      <div class="scroll-tilt-card" style="
+          position: relative;
+          margin: 0 auto;
+          max-width: 1100px;
+          aspect-ratio: 16 / 9;
+          border-radius: 28px;
+          padding: 10px;
+          background: linear-gradient(145deg, #1a1f2e 0%, #0B0F19 100%);
+          border: 1px solid rgba(201, 169, 110, 0.25);
+          box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+            0 20px 40px rgba(11, 15, 25, 0.18),
+            0 50px 80px rgba(11, 15, 25, 0.14),
+            0 90px 120px rgba(11, 15, 25, 0.08);
+          transform-origin: center top;
+          transform: rotateX(20deg) scale(1.05);
+          will-change: transform;">
+        <div style="
+            height: 100%; width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #0B0F19;
+            display: flex;
+            flex-direction: column;">
+          <!-- window chrome -->
+          <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.14);"></span>
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.14);"></span>
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: rgba(201,169,110,0.5);"></span>
+            <span style="margin-left: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 0.04em;">mh-studio / field-ops</span>
           </div>
-          <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: clamp(26px, 3vw, 34px); color: #0B0F19; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 20px;" data-i18n="work.heading">
-            Where are my people, and what did they see on site?
-          </h3>
-          <p style="font-size: 16px; line-height: 1.7; color: #334155; margin-bottom: 28px;" data-i18n="work.p1">
-            A real-estate company was running its field team over WhatsApp, photos, and handwritten notes. Reports got lost. Nobody knew who was at which building.
-          </p>
-          <p style="font-size: 16px; line-height: 1.7; color: #334155; margin-bottom: 32px;" data-i18n="work.p2">
-            We built a native app for iOS and Android: live location, a per-property task list, and structured reports with photos, all syncing into a web dashboard for the office.
-          </p>
-
-          <!-- Outcome stats -->
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 32px; padding-top: 28px; border-top: 1px solid rgba(11, 15, 25, 0.08);">
-            <div>
-              <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 28px; color: #0B0F19; letter-spacing: -0.03em; line-height: 1;">12<span style="color: #C9A96E;">w</span></div>
-              <div style="font-size: 12px; color: #64748B; margin-top: 6px;" data-i18n="work.stat1.label">Concept to App Store</div>
-            </div>
-            <div>
-              <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 28px; color: #0B0F19; letter-spacing: -0.03em; line-height: 1;">iOS<span style="color: #C9A96E;"> + </span>Android</div>
-              <div style="font-size: 12px; color: #64748B; margin-top: 6px;" data-i18n="work.stat2.label">One codebase</div>
-            </div>
-          </div>
-
-          <!-- Tech stack used -->
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #0B0F19; background: white; border: 1px solid rgba(232, 227, 216, 0.8); padding: 6px 10px; border-radius: 8px;">React Native</span>
-            <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #0B0F19; background: white; border: 1px solid rgba(232, 227, 216, 0.8); padding: 6px 10px; border-radius: 8px;">Expo</span>
-            <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #0B0F19; background: white; border: 1px solid rgba(232, 227, 216, 0.8); padding: 6px 10px; border-radius: 8px;">Supabase</span>
-            <span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #0B0F19; background: white; border: 1px solid rgba(232, 227, 216, 0.8); padding: 6px 10px; border-radius: 8px;">Next.js dashboard</span>
-          </div>
-        </div>
-
-        <!-- RIGHT: Visual: browser / dashboard mockup -->
-        <div style="position: relative; z-index: 2;">
-          <div style="background: white; border-radius: 14px; box-shadow: 0 30px 60px -20px rgba(11, 15, 25, 0.3), 0 10px 24px rgba(11, 15, 25, 0.08); border: 1px solid rgba(232, 227, 216, 0.8); overflow: hidden;">
-            <!-- Browser chrome -->
-            <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #F7F5F0; border-bottom: 1px solid rgba(232, 227, 216, 0.8);">
-              <div style="display: flex; gap: 6px;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #E8E3D8;"></div>
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #E8E3D8;"></div>
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #E8E3D8;"></div>
+          <!-- dashboard body -->
+          <div style="flex: 1; display: grid; grid-template-columns: 200px 1fr; min-height: 0;">
+            <!-- sidebar -->
+            <aside style="padding: 20px 16px; border-right: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.015); display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Workspace</div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.22);">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #C9A96E;"></span>
+                <span style="font-size: 12.5px; color: #FAF8F3; font-weight: 500;">Today</span>
+                <span style="margin-left: auto; font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #C9A96E;">14</span>
               </div>
-              <div style="flex: 1; background: white; border-radius: 6px; padding: 4px 10px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #64748B; text-align: center;">app.estate-tool.ch / dashboard</div>
-            </div>
-
-            <!-- Dashboard body -->
-            <div style="padding: 24px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 12.5px;">Properties</div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 12.5px;">Team map</div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 12.5px;">Reports</div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 12.5px;">Settings</div>
+            </aside>
+            <!-- main -->
+            <main style="padding: 22px 26px; display: flex; flex-direction: column; gap: 18px; overflow: hidden;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px;">
                 <div>
-                  <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 18px; color: #0B0F19;" data-i18n="work.dashboard.title">Today's activity</div>
-                  <div style="font-size: 12px; color: #64748B; margin-top: 2px;" data-i18n="work.dashboard.subtitle">6 agents · 14 properties</div>
+                  <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; color: #FAF8F3; letter-spacing: -0.02em;">Good morning, team.</div>
+                  <div style="font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px;">14 open tasks across 6 buildings</div>
                 </div>
                 <div style="display: flex; gap: 6px;">
-                  <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #C9A96E, #A88B54); border: 2px solid white; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center;">S</div>
-                  <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #334155, #0B0F19); border: 2px solid white; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center;">T</div>
-                  <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #0B0F19, #A88B54); border: 2px solid white; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center;">M</div>
+                  <span style="padding: 6px 10px; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.65); font-family: 'JetBrains Mono', monospace;">iOS</span>
+                  <span style="padding: 6px 10px; font-size: 11px; border-radius: 8px; background: rgba(201,169,110,0.18); color: #D9B986; font-family: 'JetBrains Mono', monospace;">Live</span>
                 </div>
               </div>
-
-              <!-- Stat cards -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                <div style="background: #F7F5F0; border-radius: 10px; padding: 12px;">
-                  <div style="font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.08em;" data-i18n="work.dashboard.visits">Visits</div>
-                  <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; color: #0B0F19; margin-top: 4px;">42</div>
-                  <div style="font-size: 10px; color: #22c55e; margin-top: 2px;">▲ 18%</div>
+              <!-- metric cards -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div style="padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size: 11px; color: rgba(255,255,255,0.5);">Reports synced</div>
+                  <div style="font-family: 'Outfit', sans-serif; font-size: 22px; color: #FAF8F3; font-weight: 700; margin-top: 6px;">42</div>
+                  <div style="font-size: 10px; color: #C9A96E; margin-top: 2px; font-family: 'JetBrains Mono', monospace;">+12 this week</div>
                 </div>
-                <div style="background: #F7F5F0; border-radius: 10px; padding: 12px;">
-                  <div style="font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.08em;" data-i18n="work.dashboard.reports">Reports</div>
-                  <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; color: #0B0F19; margin-top: 4px;">38</div>
-                  <div style="font-size: 10px; color: #22c55e; margin-top: 2px;">▲ 9%</div>
+                <div style="padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size: 11px; color: rgba(255,255,255,0.5);">Field agents</div>
+                  <div style="font-family: 'Outfit', sans-serif; font-size: 22px; color: #FAF8F3; font-weight: 700; margin-top: 6px;">7<span style="font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500;">/9</span></div>
+                  <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; font-family: 'JetBrains Mono', monospace;">on shift</div>
                 </div>
-                <div style="background: linear-gradient(135deg, #C9A96E, #A88B54); border-radius: 10px; padding: 12px; color: white;">
-                  <div style="font-size: 10px; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.08em;" data-i18n="work.dashboard.ontime">On-time</div>
-                  <div style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; margin-top: 4px;">96%</div>
-                  <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;">▲ 11%</div>
+                <div style="padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size: 11px; color: rgba(255,255,255,0.5);">Avg response</div>
+                  <div style="font-family: 'Outfit', sans-serif; font-size: 22px; color: #FAF8F3; font-weight: 700; margin-top: 6px;">6m</div>
+                  <div style="font-size: 10px; color: #22c55e; margin-top: 2px; font-family: 'JetBrains Mono', monospace;">-28% mo/mo</div>
                 </div>
               </div>
-
-              <!-- Chart -->
-              <div style="background: #F7F5F0; border-radius: 10px; padding: 16px; height: 130px; position: relative;">
-                <div style="font-size: 10px; color: #64748B; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em;" data-i18n="work.dashboard.chart">Reports this week</div>
-                <svg viewBox="0 0 300 80" style="width: 100%; height: 80px;" preserveAspectRatio="none">
+              <!-- chart mock -->
+              <div style="flex: 1; min-height: 0; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                  <div style="font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 600;">Reports per day</div>
+                  <div style="font-size: 10px; color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono', monospace;">last 14 days</div>
+                </div>
+                <svg viewBox="0 0 600 140" preserveAspectRatio="none" style="width: 100%; height: calc(100% - 26px); display: block;" aria-hidden="true">
                   <defs>
-                    <linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stop-color="#C9A96E" stop-opacity="0.35"/>
+                    <linearGradient id="tiltGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#C9A96E" stop-opacity="0.38"/>
                       <stop offset="100%" stop-color="#C9A96E" stop-opacity="0"/>
                     </linearGradient>
                   </defs>
-                  <path d="M0 60 L40 45 L80 50 L120 30 L160 35 L200 20 L240 25 L280 10 L300 15 L300 80 L0 80 Z" fill="url(#chartFill)"/>
-                  <path d="M0 60 L40 45 L80 50 L120 30 L160 35 L200 20 L240 25 L280 10 L300 15" fill="none" stroke="#C9A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <circle cx="200" cy="20" r="4" fill="#C9A96E" stroke="white" stroke-width="2"/>
+                  <path d="M0,105 L45,92 L90,98 L135,78 L180,82 L225,64 L270,70 L315,50 L360,58 L405,38 L450,46 L495,28 L540,34 L600,18 L600,140 L0,140 Z" fill="url(#tiltGrad)"/>
+                  <path d="M0,105 L45,92 L90,98 L135,78 L180,82 L225,64 L270,70 L315,50 L360,58 L405,38 L450,46 L495,28 L540,34 L600,18" fill="none" stroke="#C9A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
-            </div>
+            </main>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED WORK / CASE STUDY ============ -->
+  <section id="work" class="cases-section">
+    <div class="cases-sticky">
+      <div class="cases-backdrop" aria-hidden="true"></div>
+      <div class="cases-grain" aria-hidden="true"></div>
+      <div class="cases-inner">
+        <div class="cases-head">
+          <h2 class="section-heading reveal" data-i18n="work.title" style="font-size: clamp(30px, 4.2vw, 46px); margin-bottom: 12px;">
+            Selected case studies.
+          </h2>
+          <p class="reveal cases-sub" data-i18n="work.subtitle">
+            Real engagements, shipped. Each card tells a slice of the story: what we built, why, and the outcome.
+          </p>
+        </div>
+
+        <div class="cases-stage" id="casesStage" aria-label="Case studies carousel">
+          <div class="cases-floor" aria-hidden="true"></div>
+          <button type="button" class="cases-nav prev" id="casesPrev" aria-label="Previous case">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button type="button" class="cases-nav next" id="casesNext" aria-label="Next case">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <div class="cases-ring" id="casesRing" role="list">
+            <a href="#contact" class="case-card" role="listitem" aria-label="Case 01">
+              <div class="case-card-visual case-theme-1" aria-hidden="true">
+                <div class="case-glyph">
+                  <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="40" y="20" width="120" height="220" rx="22" stroke="rgba(201,169,110,0.7)" stroke-width="2"/>
+                    <rect x="52" y="44" width="96" height="148" rx="6" fill="rgba(201,169,110,0.10)" stroke="rgba(201,169,110,0.35)" stroke-width="1"/>
+                    <rect x="60" y="56" width="60" height="8" rx="2" fill="rgba(255,255,255,0.35)"/>
+                    <rect x="60" y="72" width="40" height="6" rx="2" fill="rgba(255,255,255,0.18)"/>
+                    <rect x="60" y="92" width="80" height="30" rx="6" fill="rgba(201,169,110,0.35)"/>
+                    <rect x="60" y="130" width="80" height="16" rx="4" fill="rgba(255,255,255,0.10)"/>
+                    <rect x="60" y="152" width="80" height="16" rx="4" fill="rgba(255,255,255,0.10)"/>
+                    <rect x="60" y="174" width="45" height="12" rx="3" fill="rgba(201,169,110,0.5)"/>
+                    <circle cx="100" cy="218" r="10" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="case-card-overlay"></div>
+              <div class="case-card-inner">
+                <div class="case-card-top">
+                  <span class="case-card-case">Case 01</span>
+                  <span class="case-card-tag" data-i18n="work.card1.tag">iOS &middot; Android</span>
+                </div>
+                <div class="case-card-content">
+                  <h3 data-i18n="work.card1.title">A field app for a real-estate team.</h3>
+                  <p data-i18n="work.card1.desc">Built in 12 weeks. Live agent location, per-property task lists, structured reports with photos, replacing WhatsApp and paper notes.</p>
+                </div>
+              </div>
+            </a>
+
+            <a href="#contact" class="case-card" role="listitem" aria-label="Case 02">
+              <div class="case-card-visual case-theme-2" aria-hidden="true">
+                <div class="case-glyph">
+                  <svg viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="16" width="220" height="168" rx="12" stroke="rgba(201,169,110,0.6)" stroke-width="2"/>
+                    <rect x="20" y="16" width="220" height="26" rx="12" fill="rgba(201,169,110,0.10)"/>
+                    <circle cx="34" cy="29" r="3" fill="rgba(255,255,255,0.4)"/>
+                    <circle cx="46" cy="29" r="3" fill="rgba(255,255,255,0.3)"/>
+                    <circle cx="58" cy="29" r="3" fill="rgba(255,255,255,0.2)"/>
+                    <rect x="36" y="60" width="62" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(201,169,110,0.25)"/>
+                    <rect x="108" y="60" width="62" height="44" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(201,169,110,0.25)"/>
+                    <rect x="180" y="60" width="48" height="44" rx="6" fill="rgba(201,169,110,0.35)"/>
+                    <path d="M36 160 L70 140 L104 148 L138 120 L172 128 L206 100 L228 110" stroke="rgba(201,169,110,0.9)" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="172" cy="128" r="4" fill="rgba(201,169,110,1)"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="case-card-overlay"></div>
+              <div class="case-card-inner">
+                <div class="case-card-top">
+                  <span class="case-card-case">Case 02</span>
+                  <span class="case-card-tag" data-i18n="work.card2.tag">Next.js &middot; Dashboard</span>
+                </div>
+                <div class="case-card-content">
+                  <h3 data-i18n="work.card2.title">The office dashboard behind the field app.</h3>
+                  <p data-i18n="work.card2.desc">A web command center for the back office: live fleet of agents, visit counts, report inbox, and on-time KPIs, all in one view.</p>
+                </div>
+              </div>
+            </a>
+
+            <a href="#contact" class="case-card" role="listitem" aria-label="Case 03">
+              <div class="case-card-visual case-theme-3" aria-hidden="true">
+                <div class="case-glyph">
+                  <svg viewBox="0 0 220 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="30" y="50" width="150" height="180" rx="10" fill="rgba(201,169,110,0.08)" stroke="rgba(201,169,110,0.35)" stroke-width="1.5"/>
+                    <rect x="40" y="30" width="150" height="180" rx="10" fill="rgba(11,15,25,0.45)" stroke="rgba(201,169,110,0.5)" stroke-width="1.5"/>
+                    <rect x="50" y="10" width="150" height="180" rx="10" fill="rgba(11,15,25,0.7)" stroke="rgba(201,169,110,0.75)" stroke-width="2"/>
+                    <rect x="66" y="30" width="92" height="7" rx="2" fill="rgba(255,255,255,0.45)"/>
+                    <rect x="66" y="46" width="72" height="5" rx="2" fill="rgba(255,255,255,0.22)"/>
+                    <rect x="66" y="66" width="118" height="1" fill="rgba(201,169,110,0.3)"/>
+                    <rect x="66" y="78" width="50" height="5" rx="2" fill="rgba(255,255,255,0.28)"/>
+                    <rect x="66" y="90" width="80" height="5" rx="2" fill="rgba(255,255,255,0.18)"/>
+                    <rect x="66" y="102" width="100" height="5" rx="2" fill="rgba(255,255,255,0.18)"/>
+                    <rect x="66" y="114" width="64" height="5" rx="2" fill="rgba(255,255,255,0.18)"/>
+                    <rect x="66" y="134" width="56" height="30" rx="5" fill="rgba(201,169,110,0.20)" stroke="rgba(201,169,110,0.45)"/>
+                    <rect x="128" y="134" width="56" height="30" rx="5" fill="rgba(201,169,110,0.20)" stroke="rgba(201,169,110,0.45)"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="case-card-overlay"></div>
+              <div class="case-card-inner">
+                <div class="case-card-top">
+                  <span class="case-card-case">Case 03</span>
+                  <span class="case-card-tag" data-i18n="work.card3.tag">Workflow</span>
+                </div>
+                <div class="case-card-content">
+                  <h3 data-i18n="work.card3.title">Structured reports replacing WhatsApp chaos.</h3>
+                  <p data-i18n="work.card3.desc">A reporting flow with templates, timestamps, and photo threads. Every visit becomes searchable instead of lost in a chat.</p>
+                </div>
+              </div>
+            </a>
+
+            <a href="#contact" class="case-card" role="listitem" aria-label="Case 04">
+              <div class="case-card-visual case-theme-4" aria-hidden="true">
+                <div class="case-glyph">
+                  <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g stroke="rgba(201,169,110,0.25)" stroke-width="1">
+                      <path d="M0 40 L240 40"/>
+                      <path d="M0 80 L240 80"/>
+                      <path d="M0 120 L240 120"/>
+                      <path d="M0 160 L240 160"/>
+                      <path d="M0 200 L240 200"/>
+                      <path d="M40 0 L40 240"/>
+                      <path d="M80 0 L80 240"/>
+                      <path d="M120 0 L120 240"/>
+                      <path d="M160 0 L160 240"/>
+                      <path d="M200 0 L200 240"/>
+                    </g>
+                    <path d="M30 200 Q 60 140 120 120 T 210 50" stroke="rgba(201,169,110,0.7)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+                    <g>
+                      <circle cx="60" cy="170" r="5" fill="rgba(201,169,110,0.85)"/>
+                      <circle cx="60" cy="170" r="14" fill="rgba(201,169,110,0.15)"/>
+                    </g>
+                    <g>
+                      <circle cx="140" cy="110" r="5" fill="rgba(201,169,110,0.85)"/>
+                      <circle cx="140" cy="110" r="14" fill="rgba(201,169,110,0.15)"/>
+                    </g>
+                    <g>
+                      <path d="M180 60 C 180 48, 196 48, 196 60 C 196 72, 188 84, 188 84 C 188 84, 180 72, 180 60 Z" fill="rgba(201,169,110,0.9)"/>
+                      <circle cx="188" cy="60" r="3" fill="#0B0F19"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+              <div class="case-card-overlay"></div>
+              <div class="case-card-inner">
+                <div class="case-card-top">
+                  <span class="case-card-case">Case 04</span>
+                  <span class="case-card-tag" data-i18n="work.card4.tag">Realtime &middot; GPS</span>
+                </div>
+                <div class="case-card-content">
+                  <h3 data-i18n="work.card4.title">Live agent tracking across 14 buildings.</h3>
+                  <p data-i18n="work.card4.desc">GPS check-ins, zone pings, and a map that tells the office exactly who is where, without a single "are you there yet?" message.</p>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -1082,15 +2506,11 @@
       <div style="position: absolute; top: -40px; left: -20px; font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-variation-settings: 'opsz' 144; font-size: clamp(140px, 22vw, 280px); line-height: 0.9; color: rgba(201, 169, 110, 0.14); letter-spacing: -0.06em; pointer-events: none; user-select: none;" aria-hidden="true">&ldquo;</div>
       <div class="reveal" style="max-width: 1040px; position: relative; z-index: 2;">
         <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #A88B54; margin-bottom: 32px;" data-i18n="manifesto.eyebrow">A note on how we build</p>
-        <p data-i18n-html="manifesto.text" style="font-family: 'Fraunces', serif; font-weight: 500; font-variation-settings: 'opsz' 144; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.15; letter-spacing: -0.025em; color: #0B0F19;">
+        <p class="text-effect-blur" data-i18n-html="manifesto.text" style="font-family: 'Fraunces', serif; font-weight: 500; font-variation-settings: 'opsz' 144; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.15; letter-spacing: -0.025em; color: #0B0F19;">
           Great software shouldn&rsquo;t announce itself.
           <span style="font-style: italic; color: #334155;">It should make the right thing the easy thing</span>
           And then disappear into the work your team was already trying to do.
         </p>
-        <div style="display: flex; align-items: center; gap: 14px; margin-top: 44px;">
-          <span style="width: 36px; height: 1px; background: #0B0F19;"></span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: #334155;" data-i18n="manifesto.attr">M&amp;H Tech &middot; Studio manifesto</span>
-        </div>
       </div>
     </div>
   </section>
@@ -1100,12 +2520,6 @@
     <div style="position: absolute; inset: 0; z-index: 1;" class="grid-bg grid-bg-fade"></div>
     <div style="max-width: 1240px; margin: 0 auto; position: relative; z-index: 2;">
       <div style="max-width: 640px; margin: 0 auto 72px; text-align: center;">
-        <div class="section-marker reveal" style="justify-content: center;">
-          <span class="num">03</span>
-          <span class="rule"></span>
-          <span class="label" data-i18n="approach.label">Approach</span>
-          <span class="rule"></span>
-        </div>
         <h2 class="section-heading reveal" data-i18n-html="approach.title" style="font-size: clamp(34px, 4.5vw, 52px); margin-bottom: 20px;">
           From first call to live product<br />
           <span class="grad-text">in three stages.</span>
@@ -1115,44 +2529,57 @@
         </p>
       </div>
 
-      <div class="stagger" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; position: relative;">
-
-        <!-- Step 1 -->
-        <div class="reveal" style="position: relative;">
-          <div style="text-align: center; position: relative;">
-            <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #C9A96E, #A88B54); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 22px; box-shadow: 0 8px 24px rgba(201, 169, 110, 0.35), 0 0 0 6px rgba(201, 169, 110, 0.08); position: relative; z-index: 2;">
-              01
-            </div>
-            <div style="background: white; border: 1px solid rgba(232, 227, 216, 0.8); border-radius: 20px; padding: 28px; box-shadow: 0 1px 3px rgba(11, 15, 25, 0.04), 0 8px 24px rgba(11, 15, 25, 0.04);">
-              <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; color: #0B0F19; margin-bottom: 10px; letter-spacing: -0.02em;" data-i18n="approach.step1.title">Scope & shape</h3>
-              <p style="font-size: 14.5px; line-height: 1.7; color: #334155;" data-i18n="approach.step1.desc">We meet, we dig into the real problem, we write down exactly what we're building. You get a fixed price and timeline before anything else.</p>
-            </div>
+      <div class="phases-diagram reveal">
+        <div class="phases-hub">
+          <div class="phases-hub-dashed">
+            <div class="phases-hub-core"><span>M&amp;H</span></div>
           </div>
+          <span class="phases-hub-label" data-i18n="approach.hub">Your project</span>
         </div>
 
-        <!-- Step 2 -->
-        <div class="reveal" style="position: relative;">
-          <div style="text-align: center; position: relative;">
-            <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #C9A96E, #A88B54); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 22px; box-shadow: 0 8px 24px rgba(201, 169, 110, 0.35), 0 0 0 6px rgba(201, 169, 110, 0.08); position: relative; z-index: 2;">
-              02
-            </div>
-            <div style="background: white; border: 1px solid rgba(232, 227, 216, 0.8); border-radius: 20px; padding: 28px; box-shadow: 0 1px 3px rgba(11, 15, 25, 0.04), 0 8px 24px rgba(11, 15, 25, 0.04);">
-              <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; color: #0B0F19; margin-bottom: 10px; letter-spacing: -0.02em;" data-i18n="approach.step2.title">Design & build</h3>
-              <p style="font-size: 14.5px; line-height: 1.7; color: #334155;" data-i18n="approach.step2.desc">We design the interface and write the code in short iterations. Every week you get a working version you can try. No black boxes.</p>
-            </div>
-          </div>
-        </div>
+        <div class="phases-wire-mobile" aria-hidden="true"></div>
 
-        <!-- Step 3 -->
-        <div class="reveal" style="position: relative;">
-          <div style="text-align: center; position: relative;">
-            <div style="width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #C9A96E, #A88B54); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 22px; box-shadow: 0 8px 24px rgba(201, 169, 110, 0.35), 0 0 0 6px rgba(201, 169, 110, 0.08); position: relative; z-index: 2;">
-              03
-            </div>
-            <div style="background: white; border: 1px solid rgba(232, 227, 216, 0.8); border-radius: 20px; padding: 28px; box-shadow: 0 1px 3px rgba(11, 15, 25, 0.04), 0 8px 24px rgba(11, 15, 25, 0.04);">
-              <h3 style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; color: #0B0F19; margin-bottom: 10px; letter-spacing: -0.02em;" data-i18n="approach.step3.title">Launch & support</h3>
-              <p style="font-size: 14.5px; line-height: 1.7; color: #334155;" data-i18n="approach.step3.desc">We ship it to the App Store, the web, or wherever it needs to live. Then we stay on, for fixes, updates, and the features users ask for.</p>
-            </div>
+        <svg class="phases-wire-svg" viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true">
+          <line class="phases-line phases-line-hub" pathLength="1" x1="500" y1="0" x2="500" y2="36" vector-effect="non-scaling-stroke" />
+          <line class="phases-line phases-line-h phases-line-h-left" pathLength="1" x1="500" y1="36" x2="154" y2="36" vector-effect="non-scaling-stroke" />
+          <line class="phases-line phases-line-h phases-line-h-right" pathLength="1" x1="500" y1="36" x2="846" y2="36" vector-effect="non-scaling-stroke" />
+          <line class="phases-line phases-line-branch-1" pathLength="1" x1="154" y1="36" x2="154" y2="80" vector-effect="non-scaling-stroke" />
+          <line class="phases-line phases-line-branch-2" pathLength="1" x1="500" y1="36" x2="500" y2="80" vector-effect="non-scaling-stroke" />
+          <line class="phases-line phases-line-branch-3" pathLength="1" x1="846" y1="36" x2="846" y2="80" vector-effect="non-scaling-stroke" />
+          <rect class="phases-node phases-node-1" x="150" y="32" width="8" height="8" rx="1" />
+          <rect class="phases-node phases-node-2" x="496" y="32" width="8" height="8" rx="1" />
+          <rect class="phases-node phases-node-3" x="842" y="32" width="8" height="8" rx="1" />
+        </svg>
+
+        <div class="phases-cards">
+          <div class="phase-card">
+            <span class="phase-corner phase-corner-tl"></span>
+            <span class="phase-corner phase-corner-tr"></span>
+            <span class="phase-corner phase-corner-bl"></span>
+            <span class="phase-corner phase-corner-br"></span>
+            <div class="phase-num">01 <span data-i18n="approach.step.label">Phase</span></div>
+            <h3 data-i18n="approach.step1.title">Scope &amp; shape</h3>
+            <p data-i18n="approach.step1.desc">We meet, we dig into the real problem, we write down exactly what we're building. You get a fixed price and timeline before anything else.</p>
+          </div>
+
+          <div class="phase-card">
+            <span class="phase-corner phase-corner-tl"></span>
+            <span class="phase-corner phase-corner-tr"></span>
+            <span class="phase-corner phase-corner-bl"></span>
+            <span class="phase-corner phase-corner-br"></span>
+            <div class="phase-num">02 <span data-i18n="approach.step.label">Phase</span></div>
+            <h3 data-i18n="approach.step2.title">Design &amp; build</h3>
+            <p data-i18n="approach.step2.desc">We design the interface and write the code in short iterations. Every week you get a working version you can try. No black boxes.</p>
+          </div>
+
+          <div class="phase-card">
+            <span class="phase-corner phase-corner-tl"></span>
+            <span class="phase-corner phase-corner-tr"></span>
+            <span class="phase-corner phase-corner-bl"></span>
+            <span class="phase-corner phase-corner-br"></span>
+            <div class="phase-num">03 <span data-i18n="approach.step.label">Phase</span></div>
+            <h3 data-i18n="approach.step3.title">Launch &amp; support</h3>
+            <p data-i18n="approach.step3.desc">We ship it to the App Store, the web, or wherever it needs to live. Then we stay on, for fixes, updates, and the features users ask for.</p>
           </div>
         </div>
       </div>
@@ -1162,17 +2589,14 @@
   <!-- ============ ABOUT ============ -->
   <section id="about" style="padding: 100px 24px; background: #F7F5F0;">
     <div style="max-width: 1240px; margin: 0 auto;">
+      <div style="max-width: 680px; margin: 0 auto 64px; text-align: center;">
+        <h2 class="section-heading reveal" data-i18n-html="about.title" style="font-size: clamp(34px, 4.5vw, 52px); margin-bottom: 0;">
+          Two engineers,<br />
+          <span class="grad-text">one shared standard.</span>
+        </h2>
+      </div>
       <div class="about-grid" style="display: grid; grid-template-columns: 1fr; gap: 60px; align-items: center;">
         <div>
-          <div class="section-marker reveal">
-            <span class="num">04</span>
-            <span class="rule"></span>
-            <span class="label" data-i18n="about.label">The Studio</span>
-          </div>
-          <h2 class="section-heading reveal" data-i18n-html="about.title" style="font-size: clamp(34px, 4.5vw, 52px); margin-bottom: 26px;">
-            Two engineers,<br />
-            <span class="grad-text">one shared standard.</span>
-          </h2>
           <p class="reveal" data-i18n-html="about.p1" style="font-size: 17px; line-height: 1.7; color: #334155; margin-bottom: 22px;">
             M&H Tech was founded by <strong style="color: #0B0F19;">Manuel Alvarez</strong> and <strong style="color: #0B0F19;">Hassen Ben Chaabane</strong>, two computer science engineers at EPFL in Switzerland. We've spent our academic years building real things: web platforms, mobile apps, ML systems. We wanted to bring that same standard to companies who usually don't get it.
           </p>
@@ -1320,8 +2744,14 @@
   </section>
 
   <!-- ============ FOOTER ============ -->
-  <footer style="background: #0B0F19; padding: 64px 24px 40px; border-top: 1px solid rgba(255,255,255,0.06);">
-    <div style="max-width: 1240px; margin: 0 auto;">
+  <footer class="site-footer">
+    <div class="site-footer-inner" style="position: relative; max-width: 1240px; margin: 0 auto; padding: 56px 48px 36px; background:
+        radial-gradient(60% 200px at 50% 0%, rgba(201, 169, 110, 0.10), transparent 70%);
+      overflow: hidden;">
+      <!-- glowing top hairline -->
+      <span aria-hidden="true" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 42%; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(201, 169, 110, 0.55) 50%, transparent 100%); filter: blur(0.5px);"></span>
+      <span aria-hidden="true" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 22%; height: 1px; background: rgba(201, 169, 110, 0.9); box-shadow: 0 0 16px rgba(201, 169, 110, 0.6);"></span>
+
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; margin-bottom: 48px;">
         <div>
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
@@ -1376,6 +2806,15 @@
       </div>
     </div>
   </footer>
+  <style>
+    .site-footer {
+      background: linear-gradient(180deg, #0B0F19 0%, #070a12 100%);
+      position: relative;
+    }
+    @media (max-width: 640px) {
+      .site-footer-inner { padding: 44px 24px 28px !important; }
+    }
+  </style>
 
   <!-- Toast element (cross-platform email feedback) -->
   <div id="toast" class="toast" role="status" aria-live="polite">
@@ -1394,9 +2833,14 @@
         'nav.about': 'About',
         'nav.start': 'Start a Project',
         'nav.toggle': 'Toggle menu',
+        'lang.en.name': 'English',
+        'lang.fr.name': 'Français',
+        'lang.label': 'Language',
 
         'hero.available': 'Available for new projects',
-        'hero.title': '<span class="hero-word">Software</span> <span class="hero-word">that</span><br /><span class="hero-word serif-accent">quietly</span> <span class="hero-word serif-accent">runs</span><br /><span class="hero-word">your</span> <span class="hero-word">business.</span>',
+        'hero.line1': 'Software that',
+        'hero.line3': 'your business.',
+        'hero.rotate': 'quietly runs|actually works|truly powers|carefully backs',
         'hero.subtitle': "We're a two-person engineering studio from Switzerland. We design and build custom apps, websites and internal tools for companies that need real software, not templates.",
         'hero.cta.start': 'Start a project',
         'hero.cta.work': 'See our work',
@@ -1419,22 +2863,27 @@
         'services.automation.title': 'Automation &amp; AI',
         'services.automation.desc': 'Workflow automation, LLM-powered features, and internal tools that replace spreadsheets your team has outgrown.',
 
+        'showcase.label': 'Product in motion',
+        'showcase.title': 'Software <span class="serif-accent">people open</span> every day.',
+        'showcase.subtitle': 'Not decks. Not mockups. Tools your team reaches for on a Monday morning.',
+
         'work.label': 'Work',
-        'work.title': 'A field app for a real-estate team.',
-        'work.subtitle': 'Built in 12 weeks. Replaced a WhatsApp + paper workflow with one iPhone app used daily.',
-        'work.case': 'Case 01',
-        'work.location': 'Real estate · Geneva',
-        'work.heading': 'Where are my people, and what did they see on site?',
-        'work.p1': 'A real-estate company was running its field team over WhatsApp, photos, and handwritten notes. Reports got lost. Nobody knew who was at which building.',
-        'work.p2': 'We built a native app for iOS and Android: live location, a per-property task list, and structured reports with photos, all syncing into a web dashboard for the office.',
-        'work.stat1.label': 'Concept to App Store',
-        'work.stat2.label': 'One codebase',
-        'work.dashboard.title': "Today's activity",
-        'work.dashboard.subtitle': '6 agents · 14 properties',
-        'work.dashboard.visits': 'Visits',
-        'work.dashboard.reports': 'Reports',
-        'work.dashboard.ontime': 'On-time',
-        'work.dashboard.chart': 'Reports this week',
+        'work.title': 'Selected case studies.',
+        'work.subtitle': 'Real engagements, shipped. Each card tells a slice of the story: what we built, why, and the outcome.',
+        'work.scrollhint': 'Scroll to rotate',
+        'work.card.more': 'Read more',
+        'work.card1.tag': 'iOS · Android',
+        'work.card1.title': 'A field app for a real-estate team.',
+        'work.card1.desc': 'Built in 12 weeks. Live agent location, per-property task lists, structured reports with photos, replacing WhatsApp and paper notes.',
+        'work.card2.tag': 'Next.js · Dashboard',
+        'work.card2.title': 'The office dashboard behind the field app.',
+        'work.card2.desc': 'A web command center for the back office: live fleet of agents, visit counts, report inbox, and on-time KPIs, all in one view.',
+        'work.card3.tag': 'Workflow',
+        'work.card3.title': 'Structured reports replacing WhatsApp chaos.',
+        'work.card3.desc': 'A reporting flow with templates, timestamps, and photo threads. Every visit becomes searchable instead of lost in a chat.',
+        'work.card4.tag': 'Realtime · GPS',
+        'work.card4.title': 'Live agent tracking across 14 buildings.',
+        'work.card4.desc': 'GPS check-ins, zone pings, and a map that tells the office exactly who is where, without a single "are you there yet?" message.',
 
         'manifesto.eyebrow': 'A note on how we build',
         'manifesto.text': 'Great software shouldn&rsquo;t announce itself. <span style="font-style: italic; color: #334155;">It should make the right thing the easy thing.</span> And then disappear into the work your team was already trying to do.',
@@ -1443,11 +2892,13 @@
         'approach.label': 'Approach',
         'approach.title': 'From first call to live product<br /><span class="grad-text">in three stages.</span>',
         'approach.desc': 'No lengthy discovery phases with no code. You see something real in week two and every week after.',
-        'approach.step1.title': 'Scope &amp; shape',
+        'approach.hub': 'Your project',
+        'approach.step.label': 'Phase',
+        'approach.step1.title': 'Scope & shape',
         'approach.step1.desc': "We meet, we dig into the real problem, we write down exactly what we're building. You get a fixed price and timeline before anything else.",
-        'approach.step2.title': 'Design &amp; build',
+        'approach.step2.title': 'Design & build',
         'approach.step2.desc': 'We design the interface and write the code in short iterations. Every week you get a working version you can try. No black boxes.',
-        'approach.step3.title': 'Launch &amp; support',
+        'approach.step3.title': 'Launch & support',
         'approach.step3.desc': 'We ship it to the App Store, the web, or wherever it needs to live. Then we stay on, for fixes, updates, and the features users ask for.',
 
         'about.label': 'The Studio',
@@ -1499,9 +2950,14 @@
         'nav.about': 'À propos',
         'nav.start': 'Lancer un projet',
         'nav.toggle': 'Ouvrir le menu',
+        'lang.en.name': 'Anglais',
+        'lang.fr.name': 'Français',
+        'lang.label': 'Langue',
 
         'hero.available': 'Disponibles pour de nouveaux projets',
-        'hero.title': '<span class="hero-word">Des</span> <span class="hero-word">logiciels</span><br /><span class="hero-word">qui</span> <span class="hero-word serif-accent">accompagnent</span><br /><span class="hero-word serif-accent">discrètement</span> <span class="hero-word">votre activité.</span>',
+        'hero.line1': 'Des logiciels qui',
+        'hero.line3': 'votre activité.',
+        'hero.rotate': 'accompagnent|soutiennent|propulsent|structurent',
         'hero.subtitle': "Nous sommes un studio d'ingénierie à deux, basé en Suisse. Nous concevons et développons des applications sur mesure, des sites web et des outils internes pour les entreprises qui ont besoin de vrais logiciels, pas de templates.",
         'hero.cta.start': 'Lancer un projet',
         'hero.cta.work': 'Voir nos projets',
@@ -1524,22 +2980,27 @@
         'services.automation.title': 'Automatisation &amp; IA',
         'services.automation.desc': "Automatisation des flux, fonctionnalités basées sur les LLM et outils internes qui remplacent les tableurs que votre équipe a dépassés.",
 
+        'showcase.label': 'Le produit en mouvement',
+        'showcase.title': 'Des logiciels <span class="serif-accent">ouverts</span> chaque jour.',
+        'showcase.subtitle': 'Pas des slides. Pas des maquettes. Des outils que votre équipe utilise le lundi matin.',
+
         'work.label': 'Projets',
-        'work.title': 'Une application terrain pour une agence immobilière.',
-        'work.subtitle': "Livrée en 12 semaines. A remplacé un workflow WhatsApp + papier par une seule app iPhone utilisée chaque jour.",
-        'work.case': 'Cas 01',
-        'work.location': 'Immobilier · Genève',
-        'work.heading': "Où sont mes équipes, et qu'ont-elles constaté sur le terrain ?",
-        'work.p1': 'Une société immobilière gérait ses équipes de terrain via WhatsApp, photos et notes manuscrites. Les rapports se perdaient. Personne ne savait qui était dans quel bâtiment.',
-        'work.p2': 'Nous avons créé une app native pour iOS et Android : localisation en direct, liste de tâches par propriété, rapports structurés avec photos, le tout synchronisé avec un tableau de bord web pour le bureau.',
-        'work.stat1.label': "Du concept à l'App Store",
-        'work.stat2.label': 'Une seule base de code',
-        'work.dashboard.title': "Activité du jour",
-        'work.dashboard.subtitle': '6 agents · 14 propriétés',
-        'work.dashboard.visits': 'Visites',
-        'work.dashboard.reports': 'Rapports',
-        'work.dashboard.ontime': 'À temps',
-        'work.dashboard.chart': 'Rapports cette semaine',
+        'work.title': 'Études de cas sélectionnées.',
+        'work.subtitle': "Des missions concrètes, livrées. Chaque carte raconte une partie de l'histoire : ce que nous avons construit, pourquoi, et le résultat.",
+        'work.scrollhint': 'Faites défiler pour tourner',
+        'work.card.more': 'En savoir plus',
+        'work.card1.tag': 'iOS · Android',
+        'work.card1.title': "Une app terrain pour une équipe immobilière.",
+        'work.card1.desc': "Livrée en 12 semaines. Localisation des agents en direct, listes de tâches par propriété, rapports structurés avec photos, en remplacement de WhatsApp et des notes papier.",
+        'work.card2.tag': 'Next.js · Tableau de bord',
+        'work.card2.title': "Le tableau de bord bureau derrière l'app terrain.",
+        'work.card2.desc': "Un centre de commande web pour le back office : flotte d'agents en direct, nombre de visites, boîte de rapports et KPI de ponctualité, le tout en une vue.",
+        'work.card3.tag': 'Workflow',
+        'work.card3.title': "Des rapports structurés à la place du chaos WhatsApp.",
+        'work.card3.desc': "Un flux de reporting avec modèles, horodatages et fils photo. Chaque visite devient consultable au lieu de se perdre dans un chat.",
+        'work.card4.tag': 'Temps réel · GPS',
+        'work.card4.title': "Suivi des agents en direct sur 14 bâtiments.",
+        'work.card4.desc': "Check-ins GPS, pings de zone, et une carte qui dit au bureau exactement qui est où, sans un seul « t'es arrivé ? ».",
 
         'manifesto.eyebrow': 'Une note sur notre manière de construire',
         'manifesto.text': "Un bon logiciel ne doit pas se faire remarquer. <span style=\"font-style: italic; color: #334155;\">Il doit rendre la bonne chose facile.</span> Puis disparaître dans le travail que votre équipe essayait déjà d'accomplir.",
@@ -1548,11 +3009,13 @@
         'approach.label': 'Approche',
         'approach.title': 'Du premier appel au produit en ligne<br /><span class="grad-text">en trois étapes.</span>',
         'approach.desc': 'Pas de longues phases de découverte sans code. Vous voyez quelque chose de concret dès la deuxième semaine, et chaque semaine ensuite.',
+        'approach.hub': 'Votre projet',
+        'approach.step.label': 'Phase',
         'approach.step1.title': 'Cadrage',
         'approach.step1.desc': "On se rencontre, on creuse le vrai problème, on écrit exactement ce que l'on construit. Vous recevez un prix fixe et un délai avant toute chose.",
-        'approach.step2.title': 'Design &amp; développement',
+        'approach.step2.title': 'Design & développement',
         'approach.step2.desc': "Nous concevons l'interface et écrivons le code en courtes itérations. Chaque semaine, vous recevez une version fonctionnelle à tester. Pas de boîte noire.",
-        'approach.step3.title': 'Lancement &amp; support',
+        'approach.step3.title': 'Lancement & support',
         'approach.step3.desc': "Nous déployons sur l'App Store, le web, ou partout où le produit doit vivre. Puis nous restons, pour les correctifs, les mises à jour et les fonctionnalités demandées.",
 
         'about.label': 'Le Studio',
@@ -1632,6 +3095,18 @@
         btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
 
+      // Sync language dropdown state
+      document.querySelectorAll('.lang-dropdown').forEach(dd => {
+        dd.setAttribute('data-lang-current', lang);
+        const code = dd.querySelector('.lang-dropdown-code');
+        const name = dd.querySelector('.lang-dropdown-name');
+        if (code) code.textContent = lang.toUpperCase();
+        if (name) name.textContent = dict['lang.' + lang + '.name'] || (lang === 'fr' ? 'Français' : 'English');
+        dd.querySelectorAll('.lang-dropdown-option').forEach(opt => {
+          opt.setAttribute('aria-selected', opt.dataset.lang === lang ? 'true' : 'false');
+        });
+      });
+
       // After a switch, the new .hero-word spans start hidden — re-run the
       // stagger reveal so the headline animates back in.
       if (langApplied) {
@@ -1642,6 +3117,17 @@
         });
       }
       langApplied = true;
+
+      // Refresh hero rotating words for the new language
+      if (typeof window.__heroRotateSet === 'function') {
+        const str = dict['hero.rotate'] || '';
+        window.__heroRotateSet(str.split('|').map(s => s.trim()));
+      }
+
+      // Re-split text-effect blocks since data-i18n-html replaced their HTML
+      if (typeof window.__refreshTextEffects === 'function') {
+        window.__refreshTextEffects();
+      }
 
       try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
     }
@@ -1657,6 +3143,40 @@
 
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+    });
+
+    // ---------- LANGUAGE DROPDOWN ----------
+    document.querySelectorAll('.lang-dropdown').forEach(dd => {
+      const trigger = dd.querySelector('.lang-dropdown-trigger');
+      const options = dd.querySelectorAll('.lang-dropdown-option');
+      function close() {
+        dd.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+      function open() {
+        dd.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dd.classList.contains('open') ? close() : open();
+      });
+      options.forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          applyLang(opt.dataset.lang);
+          close();
+        });
+      });
+      document.addEventListener('click', (e) => {
+        if (!dd.contains(e.target)) close();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dd.classList.contains('open')) {
+          close();
+          trigger.focus();
+        }
+      });
     });
 
     applyLang(detectInitialLang());
@@ -1692,68 +3212,26 @@
       else nav.classList.remove('scrolled');
     }, { passive: true });
 
-    // Chip tabs: sliding pill + scroll spy
+    // Chip tabs: scroll-spy active state (hover animation handled purely in CSS)
     (function initChipTabs() {
       const chipTabs = document.querySelector('.chip-tabs');
       if (!chipTabs) return;
-      const pill = chipTabs.querySelector('.chip-tab-pill');
       const tabs = Array.from(chipTabs.querySelectorAll('.chip-tab'));
       const sections = tabs
         .map(tab => ({ tab, section: document.getElementById(tab.getAttribute('href').slice(1)) }))
         .filter(x => x.section);
 
-      let userOverride = null;
-      let overrideTimer = null;
-
-      function movePill(tab, animate) {
-        if (!tab) { pill.style.opacity = '0'; return; }
-        const tabRect = tab.getBoundingClientRect();
-        const parentRect = chipTabs.getBoundingClientRect();
-        if (animate === false) {
-          const prev = pill.style.transition;
-          pill.style.transition = 'none';
-          pill.style.left = (tabRect.left - parentRect.left) + 'px';
-          pill.style.width = tabRect.width + 'px';
-          pill.offsetHeight;
-          pill.style.transition = prev;
-        } else {
-          pill.style.left = (tabRect.left - parentRect.left) + 'px';
-          pill.style.width = tabRect.width + 'px';
-        }
-        pill.style.opacity = '1';
-        tabs.forEach(t => t.classList.toggle('active', t === tab));
-      }
-
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          userOverride = tab;
-          movePill(tab, true);
-          clearTimeout(overrideTimer);
-          overrideTimer = setTimeout(() => { userOverride = null; }, 900);
-        });
-      });
-
       function updateActiveSection() {
-        if (userOverride) return;
         const y = window.scrollY + 140;
         let current = null;
         for (const { tab, section } of sections) {
           if (y >= section.offsetTop) current = tab;
         }
-        if (current) movePill(current, true);
-        else {
-          pill.style.opacity = '0';
-          tabs.forEach(t => t.classList.remove('active'));
-        }
+        tabs.forEach(t => t.classList.toggle('active', t === current));
       }
 
       window.addEventListener('scroll', updateActiveSection, { passive: true });
-      window.addEventListener('resize', () => {
-        const active = chipTabs.querySelector('.chip-tab.active');
-        if (active) movePill(active, false);
-      });
-
-      // Delay initial placement so fonts/layout settle
+      window.addEventListener('resize', updateActiveSection);
       requestAnimationFrame(() => requestAnimationFrame(updateActiveSection));
     })();
 
@@ -1809,6 +3287,690 @@
         window.location.href = 'mailto:' + EMAIL;
       });
     });
+
+    // ---------- SCROLL-TILT SHOWCASE ----------
+    (function initScrollTilt() {
+      const scene = document.querySelector('.scroll-tilt');
+      if (!scene) return;
+      const card = scene.querySelector('.scroll-tilt-card');
+      const title = scene.querySelector('.scroll-tilt-title');
+      if (!card || !title) return;
+
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) {
+        card.style.transform = 'rotateX(0deg) scale(1)';
+        title.style.transform = 'translateY(0)';
+        return;
+      }
+
+      let ticking = false;
+      function update() {
+        ticking = false;
+        const isMobile = window.innerWidth <= 768;
+        const scaleStart = isMobile ? 0.85 : 1.05;
+        const scaleEnd = isMobile ? 0.98 : 1;
+        const rotateStart = isMobile ? 14 : 20;
+
+        const rect = scene.getBoundingClientRect();
+        const winH = window.innerHeight;
+        const cardRect = card.getBoundingClientRect();
+        // Progress based on card position: 0 when card enters from bottom,
+        // 1 when the card center reaches viewport center (i.e. section is
+        // settled in the middle of the screen).
+        const cardCenter = cardRect.top + cardRect.height / 2;
+        const targetCenter = winH / 2;
+        // Animate over the distance from "card center at viewport bottom" to
+        // "card center at viewport midline".
+        const travel = winH / 2 + cardRect.height / 2;
+        const raw = 1 - (cardCenter - targetCenter) / travel;
+        const p = Math.max(0, Math.min(1, raw));
+        // ease in-out
+        const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        const rotate = rotateStart - rotateStart * e;
+        const scale = scaleStart + (scaleEnd - scaleStart) * e;
+        const translate = -80 * e;
+        card.style.transform = 'rotateX(' + rotate + 'deg) scale(' + scale + ')';
+        title.style.transform = 'translateY(' + translate + 'px)';
+      }
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(update);
+          ticking = true;
+        }
+      }
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+    })();
+
+    // ---------- CASE STUDY COVERFLOW CAROUSEL ----------
+    (function initCasesCoverflow() {
+      const section = document.getElementById('work');
+      const ring = document.getElementById('casesRing');
+      const prevBtn = document.getElementById('casesPrev');
+      const nextBtn = document.getElementById('casesNext');
+      if (!section || !ring) return;
+
+      const cards = Array.from(ring.querySelectorAll('.case-card'));
+      const N = cards.length;
+      if (!N) return;
+
+      const HOLD_MS = 4000;
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let currentIdx = 0;
+      let paused = false;
+      let inView = false;
+      let timer = null;
+
+      function layout() {
+        for (let i = 0; i < N; i++) {
+          // signed distance from current, wrapped to [-N/2, N/2]
+          let offset = i - currentIdx;
+          offset = ((offset % N) + N) % N;
+          if (offset > N / 2) offset -= N;
+
+          const abs = Math.abs(offset);
+          const x = offset * 300;              // horizontal spacing
+          const z = -abs * 220;                // push back when off-center
+          const rotY = -offset * 38;           // tilt inward toward center
+          const opacity = abs === 0 ? 1 : abs === 1 ? 0.38 : abs === 2 ? 0.14 : 0;
+          const zIndex = 100 - abs;
+
+          cards[i].style.transform =
+            'translateX(' + x + 'px) translateZ(' + z + 'px) rotateY(' + rotY + 'deg)';
+          cards[i].style.opacity = String(opacity);
+          cards[i].style.zIndex = String(zIndex);
+          cards[i].style.pointerEvents = abs === 0 ? 'auto' : 'none';
+          cards[i].classList.toggle('is-front', abs === 0);
+        }
+      }
+
+      function go(delta) {
+        currentIdx = ((currentIdx + delta) % N + N) % N;
+        layout();
+      }
+
+      function schedule() {
+        if (timer) { clearTimeout(timer); timer = null; }
+        if (paused || !inView || prefersReduced) return;
+        timer = setTimeout(() => { go(1); schedule(); }, HOLD_MS);
+      }
+
+      function resetTimer() {
+        if (timer) { clearTimeout(timer); timer = null; }
+        schedule();
+      }
+
+      layout();
+
+      if (prevBtn) prevBtn.addEventListener('click', () => { go(-1); resetTimer(); });
+      if (nextBtn) nextBtn.addEventListener('click', () => { go(1); resetTimer(); });
+
+      // Keyboard navigation while section is focused/in-view
+      window.addEventListener('keydown', (e) => {
+        if (!inView) return;
+        if (e.key === 'ArrowLeft') { go(-1); resetTimer(); }
+        else if (e.key === 'ArrowRight') { go(1); resetTimer(); }
+      });
+
+      // Pause on hover so user can read the front card
+      section.addEventListener('mouseenter', () => { paused = true; schedule(); });
+      section.addEventListener('mouseleave', () => { paused = false; schedule(); });
+      section.addEventListener('focusin', () => { paused = true; schedule(); });
+      section.addEventListener('focusout', () => { paused = false; schedule(); });
+
+      // Touch swipe (basic)
+      let touchStartX = 0;
+      ring.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+      ring.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 40) { go(dx < 0 ? 1 : -1); resetTimer(); }
+      });
+
+      // Only run while section is in view
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { inView = e.isIntersecting; schedule(); });
+      }, { threshold: 0.25 });
+      io.observe(section);
+
+      // Pause when tab is hidden
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { if (timer) { clearTimeout(timer); timer = null; } }
+        else schedule();
+      });
+    })();
+
+    // ---------- PHASES DIAGRAM SCROLL-DRAW ----------
+    (function initPhasesDraw() {
+      const diagram = document.querySelector('.phases-diagram');
+      if (!diagram) return;
+      const hub = diagram.querySelector('.phases-line-hub');
+      const hLeft = diagram.querySelector('.phases-line-h-left');
+      const hRight = diagram.querySelector('.phases-line-h-right');
+      const branches = [
+        diagram.querySelector('.phases-line-branch-1'),
+        diagram.querySelector('.phases-line-branch-2'),
+        diagram.querySelector('.phases-line-branch-3'),
+      ];
+      const nodes = [
+        diagram.querySelector('.phases-node-1'),
+        diagram.querySelector('.phases-node-2'),
+        diagram.querySelector('.phases-node-3'),
+      ];
+      if (!hub || !hLeft || !hRight) return;
+
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      const seg = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+      const setLine = (el, v) => { if (el) el.style.strokeDashoffset = String(1 - v); };
+      const setNode = (el, v) => {
+        if (!el) return;
+        el.style.opacity = String(v);
+        el.style.transform = 'scale(' + v + ')';
+      };
+
+      let ticking = false;
+      function update() {
+        ticking = false;
+        const rect = diagram.getBoundingClientRect();
+        const winH = window.innerHeight;
+        // Progress: 0 when the diagram top first enters the viewport bottom,
+        // 1 when the diagram center has reached the viewport center.
+        const diagramCenter = rect.top + rect.height / 2;
+        const startCenter = winH + rect.height / 2;
+        const endCenter = winH / 2;
+        const raw = (startCenter - diagramCenter) / (startCenter - endCenter);
+        const p = Math.max(0, Math.min(1, raw));
+
+        // Stage the drawing: hub first, then out to sides, then down to cards.
+        setLine(hub, easeOut(seg(p, 0.05, 0.22)));
+        setNode(nodes[1], easeOut(seg(p, 0.18, 0.28)));
+        setLine(hLeft, easeOut(seg(p, 0.26, 0.55)));
+        setLine(hRight, easeOut(seg(p, 0.26, 0.55)));
+        setNode(nodes[0], easeOut(seg(p, 0.50, 0.62)));
+        setNode(nodes[2], easeOut(seg(p, 0.50, 0.62)));
+        setLine(branches[1], easeOut(seg(p, 0.30, 0.55)));
+        setLine(branches[0], easeOut(seg(p, 0.60, 0.82)));
+        setLine(branches[2], easeOut(seg(p, 0.60, 0.82)));
+      }
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(update);
+          ticking = true;
+        }
+      }
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+    })();
+
+    // ---------- HERO DOT GRID (interactive canvas) ----------
+    (function initHeroDots() {
+      const canvas = document.getElementById('heroDots');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const DOT_SPACING = 26;
+      const BASE_OPACITY_MIN = 0.28;
+      const BASE_OPACITY_MAX = 0.52;
+      const BASE_RADIUS = 1;
+      const INTERACTION_RADIUS = 160;
+      const INTERACTION_RADIUS_SQ = INTERACTION_RADIUS * INTERACTION_RADIUS;
+      const OPACITY_BOOST = 0.7;
+      const RADIUS_BOOST = 2.8;
+      const GRID_CELL_SIZE = Math.max(50, Math.floor(INTERACTION_RADIUS / 1.5));
+      // M&H gold dots
+      const DOT_R = 201, DOT_G = 169, DOT_B = 110;
+
+      let dots = [];
+      let grid = {};
+      let width = 0, height = 0;
+      const mouse = { x: null, y: null };
+      let frameId = null;
+
+      function createDots() {
+        dots = [];
+        grid = {};
+        if (width === 0 || height === 0) return;
+        const cols = Math.ceil(width / DOT_SPACING);
+        const rows = Math.ceil(height / DOT_SPACING);
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            const x = i * DOT_SPACING + DOT_SPACING / 2;
+            const y = j * DOT_SPACING + DOT_SPACING / 2;
+            const cellX = Math.floor(x / GRID_CELL_SIZE);
+            const cellY = Math.floor(y / GRID_CELL_SIZE);
+            const key = cellX + '_' + cellY;
+            if (!grid[key]) grid[key] = [];
+            const base = Math.random() * (BASE_OPACITY_MAX - BASE_OPACITY_MIN) + BASE_OPACITY_MIN;
+            grid[key].push(dots.length);
+            dots.push({
+              x, y,
+              targetOpacity: base,
+              currentOpacity: base,
+              opacitySpeed: (Math.random() * 0.005) + 0.002,
+              baseRadius: BASE_RADIUS,
+              currentRadius: BASE_RADIUS,
+            });
+          }
+        }
+      }
+
+      function resize() {
+        const parent = canvas.parentElement;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = parent ? parent.clientWidth : window.innerWidth;
+        const h = parent ? parent.clientHeight : window.innerHeight;
+        if (w === width && h === height) return;
+        width = w; height = h;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        createDots();
+      }
+
+      function onMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      }
+      function onMouseLeave() { mouse.x = null; mouse.y = null; }
+
+      function render() {
+        if (width === 0 || height === 0) { frameId = requestAnimationFrame(render); return; }
+        ctx.clearRect(0, 0, width, height);
+
+        const active = new Set();
+        if (mouse.x !== null && mouse.y !== null) {
+          const mcx = Math.floor(mouse.x / GRID_CELL_SIZE);
+          const mcy = Math.floor(mouse.y / GRID_CELL_SIZE);
+          const radius = Math.ceil(INTERACTION_RADIUS / GRID_CELL_SIZE);
+          for (let i = -radius; i <= radius; i++) {
+            for (let j = -radius; j <= radius; j++) {
+              const key = (mcx + i) + '_' + (mcy + j);
+              if (grid[key]) grid[key].forEach(idx => active.add(idx));
+            }
+          }
+        }
+
+        for (let i = 0; i < dots.length; i++) {
+          const d = dots[i];
+          d.currentOpacity += d.opacitySpeed;
+          if (d.currentOpacity >= d.targetOpacity || d.currentOpacity <= BASE_OPACITY_MIN) {
+            d.opacitySpeed = -d.opacitySpeed;
+            d.currentOpacity = Math.max(BASE_OPACITY_MIN, Math.min(d.currentOpacity, BASE_OPACITY_MAX));
+            d.targetOpacity = Math.random() * (BASE_OPACITY_MAX - BASE_OPACITY_MIN) + BASE_OPACITY_MIN;
+          }
+
+          let interact = 0;
+          if (mouse.x !== null && active.has(i)) {
+            const dx = d.x - mouse.x;
+            const dy = d.y - mouse.y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < INTERACTION_RADIUS_SQ) {
+              const dist = Math.sqrt(distSq);
+              interact = Math.max(0, 1 - dist / INTERACTION_RADIUS);
+              interact = interact * interact;
+            }
+          }
+
+          const op = Math.min(1, d.currentOpacity + interact * OPACITY_BOOST);
+          const r = d.baseRadius + interact * RADIUS_BOOST;
+
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + DOT_R + ',' + DOT_G + ',' + DOT_B + ',' + op.toFixed(3) + ')';
+          ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        frameId = requestAnimationFrame(render);
+      }
+
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('mousemove', onMouseMove, { passive: true });
+      document.documentElement.addEventListener('mouseleave', onMouseLeave);
+
+      if (!prefersReduced) {
+        frameId = requestAnimationFrame(render);
+      } else {
+        // draw one static frame
+        render();
+        if (frameId) { cancelAnimationFrame(frameId); frameId = null; }
+      }
+
+      // Pause when hero offscreen
+      const heroSection = canvas.closest('section');
+      if (heroSection && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (!frameId && !prefersReduced) frameId = requestAnimationFrame(render);
+            } else if (frameId) {
+              cancelAnimationFrame(frameId); frameId = null;
+            }
+          });
+        }, { threshold: 0 });
+        io.observe(heroSection);
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (frameId) { cancelAnimationFrame(frameId); frameId = null; }
+        } else if (!frameId && !prefersReduced) {
+          frameId = requestAnimationFrame(render);
+        }
+      });
+    })();
+
+    // ---------- HERO ROTATING TEXT ----------
+    (function initHeroRotate() {
+      const el = document.getElementById('heroRotate');
+      const sr = document.getElementById('heroRotateSR');
+      if (!el) return;
+
+      let words = [];
+      let index = 0;
+      let interval = null;
+      const ROTATION_MS = 2600;
+      const STAGGER_MS = 22;
+      const CHAR_EXIT_MS = 260;
+
+      function splitChars(text) {
+        if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+          try {
+            const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+            return Array.from(seg.segment(text), s => s.segment);
+          } catch (e) { /* fall through */ }
+        }
+        return Array.from(text);
+      }
+
+      function renderWord(word) {
+        if (sr) sr.textContent = word;
+        el.innerHTML = '';
+        const chars = splitChars(word);
+        const total = chars.length;
+        chars.forEach((c, i) => {
+          const span = document.createElement('span');
+          span.className = 'hero-rotate-char enter';
+          span.textContent = c === ' ' ? ' ' : c;
+          // stagger from LAST character
+          span.style.transitionDelay = ((total - 1 - i) * STAGGER_MS) + 'ms';
+          el.appendChild(span);
+          // next frame: remove enter to animate in
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => span.classList.remove('enter'));
+          });
+        });
+      }
+
+      function exitCurrent(cb) {
+        const chars = el.querySelectorAll('.hero-rotate-char');
+        if (chars.length === 0) { cb(); return; }
+        chars.forEach((c, i) => {
+          const total = chars.length;
+          c.style.transitionDelay = ((total - 1 - i) * STAGGER_MS) + 'ms';
+          c.classList.add('exit');
+        });
+        setTimeout(cb, CHAR_EXIT_MS + chars.length * STAGGER_MS);
+      }
+
+      function next() {
+        if (words.length === 0) return;
+        index = (index + 1) % words.length;
+        exitCurrent(() => renderWord(words[index]));
+      }
+
+      function start() {
+        if (interval) clearInterval(interval);
+        if (words.length > 1) interval = setInterval(next, ROTATION_MS);
+      }
+
+      function setWords(arr) {
+        words = (arr || []).filter(Boolean);
+        index = 0;
+        if (words.length > 0) renderWord(words[0]);
+        start();
+      }
+
+      // Expose globally so i18n applyLang can push new words in
+      window.__heroRotateSet = setWords;
+
+      // Initial bootstrap from current translations (after applyLang runs)
+      const str = (typeof t === 'function') ? t('hero.rotate') : '';
+      if (str) setWords(str.split('|').map(s => s.trim()));
+    })();
+
+    // ---------- TEXT EFFECT (scroll-driven per-word blur reveal) ----------
+    (function initTextEffects() {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const targets = [];
+
+      function splitElement(el) {
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        let n;
+        while ((n = walker.nextNode())) textNodes.push(n);
+
+        textNodes.forEach((node) => {
+          const parts = node.textContent.split(/(\s+)/);
+          if (parts.length === 0) return;
+          const frag = document.createDocumentFragment();
+          parts.forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) {
+              frag.appendChild(document.createTextNode(part));
+            } else {
+              const span = document.createElement('span');
+              span.className = 'te-word';
+              span.style.setProperty('--te-delay', '0ms');
+              span.textContent = part;
+              frag.appendChild(span);
+            }
+          });
+          node.parentNode.replaceChild(frag, node);
+        });
+        if (!el.hasAttribute('aria-label')) {
+          el.setAttribute('aria-label', el.textContent.trim());
+        }
+      }
+
+      function register(el) {
+        splitElement(el);
+        targets.push({ el, words: Array.from(el.querySelectorAll('.te-word')) });
+      }
+
+      function update() {
+        const vh = window.innerHeight;
+        // Reveal range: words start animating when element top enters lower 75%
+        // of viewport, and all are revealed by the time element bottom reaches 25% of viewport.
+        const startFrac = 0.85; // element top at this fraction = 0% progress
+        const endFrac = 0.35;   // element top at this fraction = 100% progress
+
+        for (const t of targets) {
+          const rect = t.el.getBoundingClientRect();
+          const topFrac = rect.top / vh;
+          let progress;
+          if (topFrac >= startFrac) progress = 0;
+          else if (topFrac <= endFrac) progress = 1;
+          else progress = (startFrac - topFrac) / (startFrac - endFrac);
+
+          const count = Math.round(progress * t.words.length);
+          for (let i = 0; i < t.words.length; i++) {
+            const shouldBeIn = i < count;
+            const isIn = t.words[i].classList.contains('in');
+            if (shouldBeIn && !isIn) t.words[i].classList.add('in');
+            else if (!shouldBeIn && isIn) t.words[i].classList.remove('in');
+          }
+        }
+      }
+
+      let raf = null;
+      function onScroll() {
+        if (raf) return;
+        raf = requestAnimationFrame(() => { raf = null; update(); });
+      }
+
+      function setupAll() {
+        targets.length = 0;
+        document.querySelectorAll('.text-effect-blur').forEach(register);
+        if (prefersReduced) {
+          // Reveal everything immediately, no scroll-driven behavior
+          targets.forEach(t => t.words.forEach(w => w.classList.add('in')));
+          return;
+        }
+        update();
+      }
+
+      window.__refreshTextEffects = setupAll;
+      setupAll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+    })();
+
+    // ---------- AURORA BACKGROUND (Three.js shader) ----------
+    (function initAurora() {
+      const mount = document.getElementById('auroraMount');
+      if (!mount || typeof THREE === 'undefined') return;
+
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+      const initialW = mount.clientWidth || window.innerWidth;
+      const initialH = mount.clientHeight || window.innerHeight;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(initialW, initialH, false);
+      renderer.domElement.style.display = 'block';
+      mount.appendChild(renderer.domElement);
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          iTime: { value: 0 },
+          iResolution: { value: new THREE.Vector2(initialW, initialH) }
+        },
+        vertexShader: 'void main() { gl_Position = vec4(position, 1.0); }',
+        fragmentShader: [
+          'precision highp float;',
+          'uniform float iTime;',
+          'uniform vec2 iResolution;',
+          '#define NUM_OCTAVES 3',
+          'float rand(vec2 n) { return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453); }',
+          'float noise(vec2 p){',
+          '  vec2 ip = floor(p);',
+          '  vec2 u = fract(p);',
+          '  u = u * u * (3.0 - 2.0 * u);',
+          '  float res = mix(',
+          '    mix(rand(ip), rand(ip + vec2(1.0, 0.0)), u.x),',
+          '    mix(rand(ip + vec2(0.0, 1.0)), rand(ip + vec2(1.0, 1.0)), u.x),',
+          '    u.y);',
+          '  return res * res;',
+          '}',
+          'float fbm(vec2 x) {',
+          '  float v = 0.0;',
+          '  float a = 0.3;',
+          '  vec2 shift = vec2(100.0);',
+          '  mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));',
+          '  for (int i = 0; i < NUM_OCTAVES; ++i) {',
+          '    v += a * noise(x);',
+          '    x = rot * x * 2.0 + shift;',
+          '    a *= 0.4;',
+          '  }',
+          '  return v;',
+          '}',
+          'vec4 tanhSafe(vec4 x) {',
+          '  vec4 e = exp(2.0 * x);',
+          '  return (e - 1.0) / (e + 1.0);',
+          '}',
+          'void main() {',
+          '  // aspect-corrected UV so ribbons fill wide hero evenly',
+          '  vec2 uv = (gl_FragCoord.xy - iResolution.xy * 0.5) / min(iResolution.x, iResolution.y);',
+          '  vec2 p = uv * mat2(4.2, -2.6, 2.6, 4.2);',
+          '  vec4 o = vec4(0.0);',
+          '  float f = 2.0 + fbm(p + vec2(iTime * 5.0, 0.0)) * 0.5;',
+          '  for (int idx = 0; idx < 48; idx++) {',
+          '    float i = float(idx) + 1.0;',
+          '    vec2 v = p + cos(i * i + (iTime + p.x * 0.08) * 0.025 + i * vec2(13.0, 11.0)) * 5.2;',
+          '    float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.35 * (1.0 - (i / 48.0));',
+          '    vec4 auroraColors = vec4(',
+          '      0.78 + 0.22 * sin(i * 0.2 + iTime * 0.4),',
+          '      0.50 + 0.30 * cos(i * 0.3 + iTime * 0.5),',
+          '      0.18 + 0.14 * sin(i * 0.4 + iTime * 0.3),',
+          '      1.0);',
+          '    vec4 currentContribution = auroraColors * exp(sin(i * i + iTime * 0.8))',
+          '      / length(max(v, vec2(v.x * f * 0.018, v.y * 0.9)));',
+          '    float thinnessFactor = smoothstep(0.0, 1.0, i / 48.0) * 0.85;',
+          '    o += currentContribution * (1.0 + tailNoise * 0.8) * thinnessFactor;',
+          '  }',
+          '  o = tanhSafe(pow(o / 120.0, vec4(1.45)));',
+          '  gl_FragColor = vec4(o.rgb * 1.9, 1.0);',
+          '}'
+        ].join('\n'),
+        transparent: true
+      });
+
+      const geometry = new THREE.PlaneGeometry(2, 2);
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+
+      let frameId = null;
+      const speed = prefersReduced ? 0 : 0.012;
+
+      function render() {
+        material.uniforms.iTime.value += speed;
+        renderer.render(scene, camera);
+        frameId = requestAnimationFrame(render);
+      }
+
+      function resize() {
+        const w = mount.clientWidth || window.innerWidth;
+        const h = mount.clientHeight || window.innerHeight;
+        renderer.setSize(w, h, false);
+        material.uniforms.iResolution.value.set(w, h);
+      }
+      window.addEventListener('resize', resize, { passive: true });
+
+      // Pause when hero is offscreen
+      const heroSection = mount.closest('section');
+      if (heroSection && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (!frameId && !prefersReduced) render();
+            } else if (frameId) {
+              cancelAnimationFrame(frameId);
+              frameId = null;
+            }
+          });
+        }, { threshold: 0 });
+        io.observe(heroSection);
+      }
+
+      // Pause when tab is hidden
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (frameId) { cancelAnimationFrame(frameId); frameId = null; }
+        } else if (!frameId && !prefersReduced) {
+          render();
+        }
+      });
+
+      if (prefersReduced) {
+        renderer.render(scene, camera);
+      } else {
+        render();
+      }
+    })();
   </script>
 
 </body>

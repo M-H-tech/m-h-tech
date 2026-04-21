@@ -2,3 +2,13 @@ node_modules/
 temporary screenshots/
 design_assets/
 CLAUDE.md
+components/
+
+# Screenshots (images + helper scripts)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+screenshot*.mjs
+screenshot*.js
