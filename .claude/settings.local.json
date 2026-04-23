@@ -10,7 +10,10 @@
       "Bash(H/our_website/)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(H/our_website/index.html)"
+      "Bash(H/our_website/index.html)",
+      "Bash(lsof -iTCP:3001 -sTCP:LISTEN -P -n)",
+      "Bash(lsof -iTCP:3030 -sTCP:LISTEN -P -n)",
+      "Bash(lsof -iTCP:4000 -sTCP:LISTEN -P -n)"
     ]
   }
 }
