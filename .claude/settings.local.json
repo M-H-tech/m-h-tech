@@ -13,7 +13,11 @@
       "Bash(H/our_website/index.html)",
       "Bash(lsof -iTCP:3001 -sTCP:LISTEN -P -n)",
       "Bash(lsof -iTCP:3030 -sTCP:LISTEN -P -n)",
-      "Bash(lsof -iTCP:4000 -sTCP:LISTEN -P -n)"
+      "Bash(lsof -iTCP:4000 -sTCP:LISTEN -P -n)",
+      "Bash(lsof -ti:3001)",
+      "Bash(git check-ignore *)",
+      "Bash(H/our_website/config.local.example.js)",
+      "Bash(lsof -iTCP:3001 -sTCP:LISTEN -n -P)"
     ]
   }
 }

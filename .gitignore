@@ -4,6 +4,9 @@ design_assets/
 CLAUDE.md
 components/
 
+# Local secrets
+config.local.js
+
 # Screenshots (images + helper scripts)
 *.png
 *.jpg
