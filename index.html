@@ -3084,7 +3084,7 @@
               </span>
               <svg class="cf-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </button>
-            <p class="cf-fallback" data-i18n-html="form.fallback">or write us at <a href="mailto:mh.manuelalvarez@gmail.com" data-contact-email>mh.manuelalvarez@gmail.com</a></p>
+            <p class="cf-fallback" data-i18n-html="form.fallback">or write us at <span class="cf-email">manuel.alvarez@mhtech.ch</span></p>
           </div>
 
           <div class="cf-success" id="cfSuccess" hidden>
@@ -3097,7 +3097,7 @@
 
           <div class="cf-error" id="cfError" hidden role="alert">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span data-i18n-html="form.error">Something went wrong. Try again, or email us directly at <a href="mailto:mh.manuelalvarez@gmail.com" data-contact-email>mh.manuelalvarez@gmail.com</a>.</span>
+            <span data-i18n-html="form.error">Something went wrong. Try again, or email us directly at <span class="cf-email">manuel.alvarez@mhtech.ch</span>.</span>
           </div>
         </form>
 
@@ -3179,7 +3179,7 @@
 
         <div>
           <div style="font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; color: rgba(255,255,255,0.9); margin-bottom: 16px;" data-i18n="footer.contact">Get in touch</div>
-          <a href="mailto:mh.manuelalvarez@gmail.com" data-contact-email style="color: rgba(255,255,255,0.55); text-decoration: none; font-size: 14px; font-family: 'JetBrains Mono', monospace; transition: color 0.2s ease; display: block; word-break: break-all; cursor: pointer;" onmouseover="this.style.color='#C9A96E'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">mh.manuelalvarez@gmail.com</a>
+          <span style="color: rgba(255,255,255,0.55); font-size: 14px; font-family: 'JetBrains Mono', monospace; display: block; word-break: break-all;">manuel.alvarez@mhtech.ch</span>
         </div>
       </div>
 
@@ -3324,10 +3324,10 @@
         'form.message.label': 'Message',
         'form.message.ph': "What are you trying to build, and what's getting in the way today?",
         'form.submit': 'Send',
-        'form.fallback': 'or write us at <a href="mailto:mh.manuelalvarez@gmail.com" data-contact-email>mh.manuelalvarez@gmail.com</a>',
+        'form.fallback': 'or write us at <span class="cf-email">manuel.alvarez@mhtech.ch</span>',
         'form.success.title': 'Got it. Reply inbound.',
         'form.success.desc': "We'll get back to you within a day with next steps.",
-        'form.error': 'Something went wrong. Try again, or email us directly at <a href="mailto:mh.manuelalvarez@gmail.com" data-contact-email>mh.manuelalvarez@gmail.com</a>.',
+        'form.error': 'Something went wrong. Try again, or email us directly at <span class="cf-email">manuel.alvarez@mhtech.ch</span>.',
         'form.validation.required': 'Please fill in this field.',
         'form.validation.email': 'Please enter a valid email.',
         'toast.sent': 'Message sent. Talk soon.',
@@ -3459,10 +3459,10 @@
         'form.message.label': 'Message',
         'form.message.ph': "Qu'essayez-vous de construire, et qu'est-ce qui vous freine aujourd'hui ?",
         'form.submit': 'Envoyer',
-        'form.fallback': 'ou écrivez-nous à <a href="mailto:mh.manuelalvarez@gmail.com" data-contact-email>mh.manuelalvarez@gmail.com</a>',
+        'form.fallback': 'ou écrivez-nous à <span class="cf-email">manuel.alvarez@mhtech.ch</span>',
         'form.success.title': 'Bien reçu. Réponse en route.',
         'form.success.desc': 'Nous revenons vers vous en moins de 24 heures avec les prochaines étapes.',
-        'form.error': "Une erreur est survenue. Réessayez, ou écrivez-nous à <a href=\"mailto:mh.manuelalvarez@gmail.com\" data-contact-email>mh.manuelalvarez@gmail.com</a>.",
+        'form.error': "Une erreur est survenue. Réessayez, ou écrivez-nous à <span class=\"cf-email\">manuel.alvarez@mhtech.ch</span>.",
         'form.validation.required': 'Veuillez remplir ce champ.',
         'form.validation.email': 'Veuillez saisir un e-mail valide.',
         'toast.sent': 'Message envoyé. À très vite.',
@@ -3672,8 +3672,7 @@
       });
     });
 
-    // Cross-platform email contact: copy to clipboard + attempt mailto
-    const EMAIL = 'mh.manuelalvarez@gmail.com';
+    // Email is displayed as plain text (no mailto) to avoid app errors on devices without a configured mail client.
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
     let toastTimer;
@@ -3684,35 +3683,6 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3600);
     }
-
-    async function copyEmail() {
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(EMAIL);
-          return true;
-        }
-        const ta = document.createElement('textarea');
-        ta.value = EMAIL;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        return ok;
-      } catch (e) {
-        return false;
-      }
-    }
-
-    document.addEventListener('click', async (e) => {
-      const el = e.target.closest('[data-contact-email]');
-      if (!el) return;
-      e.preventDefault();
-      const copied = await copyEmail();
-      showToast(copied ? t('toast.copied.prefix') + EMAIL : EMAIL);
-      window.location.href = 'mailto:' + EMAIL;
-    });
 
     // ---------- CONTACT FORM ----------
     (function initContactForm() {
