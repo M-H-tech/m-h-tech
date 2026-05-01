@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node scripts/serve.mjs",
+    "screenshot": "node scripts/screenshot.mjs"
   },
   "repository": {
     "type": "git",

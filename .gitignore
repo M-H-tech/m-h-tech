@@ -2,7 +2,7 @@ node_modules/
 temporary screenshots/
 design_assets/
 CLAUDE.md
-components/
+briefs/
 
 # Local secrets
 config.local.js
@@ -16,3 +16,7 @@ config.local.js
 screenshot*.mjs
 screenshot*.js
 .playwright-mcp/
+
+# Site-served assets (must ship despite *.png ignore above)
+!og-image.png
+!apple-touch-icon.png
