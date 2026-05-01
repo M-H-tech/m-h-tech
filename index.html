@@ -1215,7 +1215,7 @@
     }
 
     /* ---------- HERO WORD REVEAL ---------- */
-    .hero-heading { overflow: hidden; }
+    .hero-heading { overflow: hidden; padding-bottom: 0.18em; }
     .hero-word {
       display: inline-block;
       opacity: 0;
@@ -1412,20 +1412,14 @@
     }
     .lang-dropdown-code {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 22px;
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      background: linear-gradient(135deg, #C9A96E, #A88B54);
-      color: white;
-      box-shadow: 0 1px 2px rgba(201, 169, 110, 0.35);
+      width: 22px;
+      height: 16px;
+      border-radius: 3px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(11, 15, 25, 0.12), 0 1px 2px rgba(11, 15, 25, 0.06);
     }
+    .lang-dropdown-code svg { width: 100%; height: 100%; display: block; }
     .lang-dropdown-name { font-size: 12.5px; color: #0B0F19; }
     .lang-dropdown-chev {
       color: #64748B;
@@ -1480,23 +1474,17 @@
     }
     .lang-dropdown-option-code {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 26px;
-      height: 22px;
-      padding: 0 6px;
-      border-radius: 6px;
-      background: rgba(11, 15, 25, 0.05);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-      font-weight: 600;
-      color: #64748B;
-      letter-spacing: 0.08em;
+      width: 24px;
+      height: 18px;
+      border-radius: 3px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(11, 15, 25, 0.1), 0 1px 2px rgba(11, 15, 25, 0.06);
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
     }
+    .lang-dropdown-option-code svg { width: 100%; height: 100%; display: block; }
     .lang-dropdown-option[aria-selected="true"] .lang-dropdown-option-code {
-      background: linear-gradient(135deg, #C9A96E, #A88B54);
-      color: white;
-      box-shadow: 0 1px 2px rgba(201, 169, 110, 0.35);
+      box-shadow: 0 0 0 1.5px #C9A96E, 0 1px 4px rgba(201, 169, 110, 0.3);
     }
     .lang-dropdown-option-name { flex: 1; }
     .lang-dropdown-check {
@@ -1946,14 +1934,15 @@
       background: rgba(201, 169, 110, 0.1) !important;
       color: #FAF8F3 !important;
     }
+    .lang-dropdown-code {
+      box-shadow: 0 0 0 1px rgba(242, 236, 220, 0.18), 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    }
     .lang-dropdown-option-code {
-      background: rgba(242, 236, 220, 0.06) !important;
-      color: rgba(242, 236, 220, 0.6) !important;
+      box-shadow: 0 0 0 1px rgba(242, 236, 220, 0.16), 0 1px 2px rgba(0, 0, 0, 0.3) !important;
     }
     .lang-dropdown-option[aria-selected="true"] { color: #FAF8F3 !important; }
     .lang-dropdown-option[aria-selected="true"] .lang-dropdown-option-code {
-      background: linear-gradient(135deg, #C9A96E, #A88B54) !important;
-      color: #07090F !important;
+      box-shadow: 0 0 0 1.5px #E4C694, 0 0 8px rgba(201, 169, 110, 0.4) !important;
     }
 
     /* Typography on dark */
@@ -2231,6 +2220,34 @@
 </head>
 <body>
 
+  <!-- Inline flag symbols, referenced by the language dropdown via <use href="#flag-XX"> -->
+  <svg width="0" height="0" style="position: absolute; pointer-events: none;" aria-hidden="true">
+    <defs>
+      <symbol id="flag-en" viewBox="0 0 22 16">
+        <rect width="22" height="16" fill="#012169"/>
+        <path d="M0 0 L22 16 M22 0 L0 16" stroke="#FFFFFF" stroke-width="3"/>
+        <path d="M0 0 L22 16 M22 0 L0 16" stroke="#C8102E" stroke-width="1.6"/>
+        <path d="M11 0 V16 M0 8 H22" stroke="#FFFFFF" stroke-width="3.5"/>
+        <path d="M11 0 V16 M0 8 H22" stroke="#C8102E" stroke-width="2"/>
+      </symbol>
+      <symbol id="flag-fr" viewBox="0 0 22 16">
+        <rect width="22" height="16" fill="#FFFFFF"/>
+        <rect width="7.33" height="16" fill="#0055A4"/>
+        <rect x="14.67" width="7.33" height="16" fill="#EF4135"/>
+      </symbol>
+      <symbol id="flag-es" viewBox="0 0 22 16">
+        <rect width="22" height="16" fill="#FFC400"/>
+        <rect width="22" height="4" fill="#AA151B"/>
+        <rect y="12" width="22" height="4" fill="#AA151B"/>
+      </symbol>
+      <symbol id="flag-de" viewBox="0 0 22 16">
+        <rect width="22" height="16" fill="#000000"/>
+        <rect y="5.33" width="22" height="5.34" fill="#DD0000"/>
+        <rect y="10.67" width="22" height="5.33" fill="#FFCE00"/>
+      </symbol>
+    </defs>
+  </svg>
+
   <!-- ============ NAV ============ -->
   <nav class="nav" id="nav">
     <div style="max-width: 1240px; margin: 0 auto; padding: 0 24px;">
@@ -2266,19 +2283,29 @@
           </div>
           <div class="lang-dropdown" data-lang-current="en">
             <button type="button" class="lang-dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="lang-dropdown-code">EN</span>
+              <span class="lang-dropdown-code"><svg viewBox="0 0 22 16"><use href="#flag-en"/></svg></span>
               <span class="lang-dropdown-name" data-i18n="lang.en.name">English</span>
               <svg class="lang-dropdown-chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
             </button>
             <div class="lang-dropdown-menu" role="listbox" aria-label="Language">
               <button type="button" class="lang-dropdown-option" data-lang="en" role="option" aria-selected="true">
-                <span class="lang-dropdown-option-code">EN</span>
+                <span class="lang-dropdown-option-code"><svg viewBox="0 0 22 16"><use href="#flag-en"/></svg></span>
                 <span class="lang-dropdown-option-name" data-i18n="lang.en.name">English</span>
                 <svg class="lang-dropdown-check" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7.5 6 10.5 11 4"/></svg>
               </button>
               <button type="button" class="lang-dropdown-option" data-lang="fr" role="option" aria-selected="false">
-                <span class="lang-dropdown-option-code">FR</span>
+                <span class="lang-dropdown-option-code"><svg viewBox="0 0 22 16"><use href="#flag-fr"/></svg></span>
                 <span class="lang-dropdown-option-name" data-i18n="lang.fr.name">Français</span>
+                <svg class="lang-dropdown-check" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7.5 6 10.5 11 4"/></svg>
+              </button>
+              <button type="button" class="lang-dropdown-option" data-lang="es" role="option" aria-selected="false">
+                <span class="lang-dropdown-option-code"><svg viewBox="0 0 22 16"><use href="#flag-es"/></svg></span>
+                <span class="lang-dropdown-option-name" data-i18n="lang.es.name">Español</span>
+                <svg class="lang-dropdown-check" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7.5 6 10.5 11 4"/></svg>
+              </button>
+              <button type="button" class="lang-dropdown-option" data-lang="de" role="option" aria-selected="false">
+                <span class="lang-dropdown-option-code"><svg viewBox="0 0 22 16"><use href="#flag-de"/></svg></span>
+                <span class="lang-dropdown-option-name" data-i18n="lang.de.name">Deutsch</span>
                 <svg class="lang-dropdown-check" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7.5 6 10.5 11 4"/></svg>
               </button>
             </div>
@@ -3221,6 +3248,8 @@
         'nav.toggle': 'Toggle menu',
         'lang.en.name': 'English',
         'lang.fr.name': 'Français',
+        'lang.es.name': 'Español',
+        'lang.de.name': 'Deutsch',
         'lang.label': 'Language',
 
         'hero.available': 'Available for new projects',
@@ -3356,6 +3385,8 @@
         'nav.toggle': 'Ouvrir le menu',
         'lang.en.name': 'Anglais',
         'lang.fr.name': 'Français',
+        'lang.es.name': 'Espagnol',
+        'lang.de.name': 'Allemand',
         'lang.label': 'Langue',
 
         'hero.available': 'Disponibles pour de nouveaux projets',
@@ -3481,6 +3512,280 @@
 
         'toast.copied': 'E-mail copié dans le presse-papier',
         'toast.copied.prefix': 'E-mail copié : '
+      },
+      es: {
+        'nav.services': 'Servicios',
+        'nav.work': 'Proyectos',
+        'nav.approach': 'Método',
+        'nav.about': 'Nosotros',
+        'nav.start': 'Iniciar un proyecto',
+        'nav.toggle': 'Abrir menú',
+        'lang.en.name': 'Inglés',
+        'lang.fr.name': 'Francés',
+        'lang.es.name': 'Español',
+        'lang.de.name': 'Alemán',
+        'lang.label': 'Idioma',
+
+        'hero.available': 'Disponibles para nuevos proyectos',
+        'hero.line1': 'Software que',
+        'hero.line3': 'tu negocio.',
+        'hero.rotate': 'impulsa|sostiene|potencia|acompaña',
+        'hero.subtitle': 'Somos un estudio de ingeniería de dos personas, con sede en Suiza. Diseñamos y construimos apps a medida, sitios web y herramientas internas para empresas que necesitan software real, no plantillas.',
+        'hero.cta.start': 'Iniciar un proyecto',
+        'hero.cta.work': 'Ver nuestros proyectos',
+        'hero.trust.founders': 'Fundadores ingenieros',
+        'hero.trust.reply': 'Respuesta garantizada',
+        'hero.trust.based': 'Con sede en Suiza',
+
+        'tech.label': 'Las herramientas con las que construimos',
+
+        'services.label': 'Servicios',
+        'services.title': 'Cuatro disciplinas.<br /><span class="grad-text">Un solo equipo entregando.</span>',
+        'services.desc': 'Sin transferencias, sin agencias intermediarias, sin subcontratación. Las personas que definen tu proyecto son las que escriben el código.',
+        'services.featured.eyebrow': 'Nuestro oficio',
+        'services.featured.title': 'Plataformas web que <span class="serif-accent" style="color: #C9A96E;">de verdad cargan</span>.',
+        'services.featured.desc': 'Sitios de marketing, paneles SaaS, sistemas de reservas. Hechos para ser rápidos, accesibles y fáciles de actualizar, sin que dependas de nosotros para añadir una coma.',
+        'services.mobile.title': 'Apps móviles',
+        'services.mobile.desc': 'iOS y Android desde una sola base de código. Desde herramientas de campo hasta apps para clientes, publicadas en las dos tiendas.',
+        'services.backend.title': 'Backend &amp; APIs',
+        'services.backend.desc': 'Bases de datos, autenticación, integraciones y tareas en segundo plano, diseñadas para no estorbar.',
+        'services.automation.title': 'Automatización &amp; IA',
+        'services.automation.desc': 'Automatización de flujos, funciones con LLM y herramientas internas que reemplazan a las hojas de cálculo que tu equipo ya superó.',
+
+        'showcase.label': 'Producto en movimiento',
+        'showcase.title': 'Software que <span class="serif-accent">la gente abre</span> cada día.',
+        'showcase.subtitle': 'Sin presentaciones. Sin maquetas. Herramientas que tu equipo usa un lunes por la mañana.',
+
+        'work.label': 'Proyectos',
+        'work.title': 'Casos seleccionados.',
+        'work.subtitle': 'Encargos reales, entregados. Cada tarjeta cuenta una parte: qué construimos, por qué y el resultado.',
+        'work.scrollhint': 'Desplázate para girar',
+        'work.card.more': 'Leer más',
+        'work.card1.tag': 'iOS · Android',
+        'work.card1.title': 'Una app de campo para un equipo inmobiliario.',
+        'work.card1.desc': 'Construida en 12 semanas. Localización de agentes en directo, listas de tareas por propiedad, reportes estructurados con fotos, en lugar de WhatsApp y notas en papel.',
+        'work.card2.tag': 'Next.js · Panel',
+        'work.card2.title': 'El panel de oficina detrás de la app de campo.',
+        'work.card2.desc': 'Un centro de mando web para la oficina: flota de agentes en directo, número de visitas, bandeja de reportes y KPIs de puntualidad, todo en una vista.',
+        'work.card3.tag': 'Workflow',
+        'work.card3.title': 'Reportes estructurados en lugar del caos de WhatsApp.',
+        'work.card3.desc': 'Un flujo con plantillas, marcas de tiempo e hilos de fotos. Cada visita queda buscable en lugar de perderse en un chat.',
+        'work.card4.tag': 'Tiempo real · GPS',
+        'work.card4.title': 'Seguimiento de agentes en directo en 14 edificios.',
+        'work.card4.desc': 'Check-ins por GPS, pings de zona y un mapa que le dice a la oficina exactamente quién está dónde, sin un solo "¿ya llegaste?".',
+
+        'manifesto.eyebrow': 'Una nota sobre cómo construimos',
+        'manifesto.text': 'Un buen software no debe llamar la atención. <span style="font-style: italic; color: #334155;">Debe hacer que lo correcto sea lo fácil.</span> Y luego desaparecer en el trabajo que tu equipo ya estaba intentando hacer.',
+        'manifesto.attr': 'M&amp;H Tech &middot; Manifiesto del estudio',
+
+        'approach.label': 'Método',
+        'approach.title': 'De la primera llamada al producto en producción<br /><span class="grad-text">en tres etapas.</span>',
+        'approach.desc': 'Sin largas fases de descubrimiento sin código. Ves algo real ya en la segunda semana, y cada semana después.',
+        'approach.hub': 'Tu proyecto',
+        'approach.step.label': 'Fase',
+        'approach.step1.title': 'Alcance y forma',
+        'approach.step1.desc': 'Nos reunimos, profundizamos en el problema real y dejamos por escrito exactamente qué vamos a construir. Recibes un precio fijo y un plazo antes de cualquier otra cosa.',
+        'approach.step2.title': 'Diseño y desarrollo',
+        'approach.step2.desc': 'Diseñamos la interfaz y escribimos el código en iteraciones cortas. Cada semana recibes una versión funcional que puedes probar. Sin cajas negras.',
+        'approach.step3.title': 'Lanzamiento y soporte',
+        'approach.step3.desc': 'Lo enviamos a la App Store, la web o donde sea necesario. Después seguimos contigo, para correcciones, actualizaciones y las funciones que pidan los usuarios.',
+
+        'about.label': 'El estudio',
+        'about.title': 'Dos ingenieros,<br /><span class="grad-text">un mismo estándar.</span>',
+        'about.p1': 'M&amp;H Tech fue fundada por <strong style="color: #0B0F19;">Manuel Alvarez</strong> y <strong style="color: #0B0F19;">Hassen Ben Chaabane</strong>, dos ingenieros informáticos en la EPFL en Suiza. Pasamos nuestros años académicos construyendo cosas reales: plataformas web, apps móviles, sistemas ML. Queríamos llevar ese mismo estándar a empresas que normalmente no lo reciben.',
+        'about.p2': 'Nos mantenemos pequeños a propósito. Cada proyecto nos involucra a los dos, totalmente, desde la primera conversación hasta la versión que sigue funcionando un año después.',
+        'about.bullet1': 'Cotización a precio fijo',
+        'about.bullet2': 'Demos semanales',
+        'about.bullet3': 'El código fuente es tuyo',
+        'about.bullet4': 'Soporte tras el lanzamiento',
+        'about.team': 'El equipo',
+        'about.role': 'Cofundador · MSc CS @ EPFL',
+        'about.location': 'Lausana, CH',
+
+        'contact.availability': 'Respondemos en menos de 24 horas',
+        'contact.title': 'Construyamos algo<br /><span style="background: linear-gradient(135deg, #C9A96E, #FFFFFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">que de verdad llegue a producción.</span>',
+        'contact.desc': 'Cuéntanos sobre tu proyecto. Te respondemos en un día con preguntas, próximos pasos y un presupuesto sin sorpresas.',
+        'contact.email.eyebrow': 'Escríbenos',
+        'contact.email.action': 'Enviar un mensaje',
+        'contact.next.eyebrow': 'Lo que sigue',
+        'contact.next.title': 'Respuesta en 24 horas',
+        'contact.next.step1': 'Llamada de descubrimiento de 30 min',
+        'contact.next.step2': 'Propuesta escrita + precio fijo',
+        'contact.next.step3': 'Inicio en la misma semana',
+        'contact.location.eyebrow': 'Con sede en',
+        'contact.location.title': 'Lausana, Suiza',
+        'contact.location.desc': 'Trabajamos con clientes en Suiza, Europa y de forma remota.',
+        'contact.cta': 'Empezar la conversación',
+        'form.eyebrow': 'Consulta de proyecto',
+        'form.title': 'Cuéntanos qué estás construyendo.',
+        'form.name.label': 'Nombre completo',
+        'form.name.ph': 'Introduce tu nombre completo',
+        'form.email.label': 'Correo electrónico',
+        'form.email.ph': 'Introduce tu correo electrónico',
+        'form.company.label': 'Empresa <span class="cf-optional">(opcional)</span>',
+        'form.company.ph': 'Tu empresa',
+        'form.message.label': 'Mensaje',
+        'form.message.ph': '¿Qué intentas construir y qué te lo está bloqueando hoy?',
+        'form.submit': 'Enviar',
+        'form.fallback': 'o escríbenos a <span class="cf-email">manuel.alvarez@mhtech.ch</span>',
+        'form.success.title': 'Recibido. Respuesta en camino.',
+        'form.success.desc': 'Te contestamos en menos de un día con los próximos pasos.',
+        'form.error': 'Algo salió mal. Vuelve a intentarlo o escríbenos a <span class="cf-email">manuel.alvarez@mhtech.ch</span>.',
+        'form.validation.required': 'Por favor, completa este campo.',
+        'form.validation.email': 'Por favor, introduce un correo válido.',
+        'toast.sent': 'Mensaje enviado. Hablamos pronto.',
+
+        'footer.tagline': 'Un estudio suizo de software que construye apps y sitios web para empresas con ambición.',
+        'footer.location': 'Lausana, Suiza',
+        'footer.studio': 'Estudio',
+        'footer.build': 'Lo que construimos',
+        'footer.contact': 'Contacto',
+        'footer.build.web': 'Plataformas web',
+        'footer.build.mobile': 'Apps móviles (iOS + Android)',
+        'footer.build.internal': 'Herramientas internas y paneles',
+        'footer.build.ai': 'Automatización y funciones de IA',
+        'footer.copyright': '© 2026 M&H Tech · Todos los derechos reservados.',
+        'footer.built': 'Construido con cuidado en Suiza',
+
+        'toast.copied': 'Correo copiado al portapapeles',
+        'toast.copied.prefix': 'Correo copiado: '
+      },
+      de: {
+        'nav.services': 'Leistungen',
+        'nav.work': 'Projekte',
+        'nav.approach': 'Ansatz',
+        'nav.about': 'Über uns',
+        'nav.start': 'Projekt starten',
+        'nav.toggle': 'Menü öffnen',
+        'lang.en.name': 'Englisch',
+        'lang.fr.name': 'Französisch',
+        'lang.es.name': 'Spanisch',
+        'lang.de.name': 'Deutsch',
+        'lang.label': 'Sprache',
+
+        'hero.available': 'Verfügbar für neue Projekte',
+        'hero.line1': 'Software',
+        'hero.line3': 'Ihr Geschäft.',
+        'hero.rotate': 'stärkt|trägt|beflügelt|begleitet',
+        'hero.subtitle': 'Wir sind ein Engineering-Studio mit zwei Personen aus der Schweiz. Wir gestalten und bauen massgeschneiderte Apps, Websites und interne Tools für Unternehmen, die echte Software brauchen, keine Templates.',
+        'hero.cta.start': 'Projekt starten',
+        'hero.cta.work': 'Unsere Arbeit ansehen',
+        'hero.trust.founders': 'Gründer aus der Technik',
+        'hero.trust.reply': 'Antwort garantiert',
+        'hero.trust.based': 'Mit Sitz in der Schweiz',
+
+        'tech.label': 'Die Werkzeuge, mit denen wir bauen',
+
+        'services.label': 'Leistungen',
+        'services.title': 'Vier Disziplinen.<br /><span class="grad-text">Ein Team, das liefert.</span>',
+        'services.desc': 'Keine Übergaben, keine Zwischenagenturen, kein Outsourcing. Die Personen, die Ihr Projekt definieren, schreiben auch den Code.',
+        'services.featured.eyebrow': 'Unser Handwerk',
+        'services.featured.title': 'Webplattformen, die <span class="serif-accent" style="color: #C9A96E;">wirklich laden</span>.',
+        'services.featured.desc': 'Marketing-Sites, SaaS-Dashboards, Buchungssysteme. Gebaut, um schnell, zugänglich und einfach zu pflegen zu sein, ohne dass Sie uns für jedes Komma anrufen.',
+        'services.mobile.title': 'Mobile Apps',
+        'services.mobile.desc': 'iOS und Android aus einer Codebasis. Vom Field-Tool bis zur Kunden-App, in beiden Stores veröffentlicht.',
+        'services.backend.title': 'Backend &amp; APIs',
+        'services.backend.desc': 'Datenbanken, Auth, Integrationen und Hintergrundjobs, gebaut um nicht im Weg zu stehen.',
+        'services.automation.title': 'Automatisierung &amp; KI',
+        'services.automation.desc': 'Workflow-Automatisierung, LLM-basierte Funktionen und interne Tools, die Tabellen ersetzen, die Ihr Team längst überholt hat.',
+
+        'showcase.label': 'Produkt in Bewegung',
+        'showcase.title': 'Software, die <span class="serif-accent">jeden Tag</span> geöffnet wird.',
+        'showcase.subtitle': 'Keine Decks. Keine Mockups. Werkzeuge, nach denen Ihr Team am Montagmorgen greift.',
+
+        'work.label': 'Projekte',
+        'work.title': 'Ausgewählte Fallstudien.',
+        'work.subtitle': 'Echte Mandate, ausgeliefert. Jede Karte erzählt einen Ausschnitt: was wir gebaut haben, warum, und das Ergebnis.',
+        'work.scrollhint': 'Scrollen, um zu drehen',
+        'work.card.more': 'Mehr lesen',
+        'work.card1.tag': 'iOS · Android',
+        'work.card1.title': 'Eine Field-App für ein Immobilienteam.',
+        'work.card1.desc': 'In 12 Wochen gebaut. Live-Standort der Agenten, Aufgabenlisten je Objekt, strukturierte Berichte mit Fotos, statt WhatsApp und Notizzettel.',
+        'work.card2.tag': 'Next.js · Dashboard',
+        'work.card2.title': 'Das Office-Dashboard hinter der Field-App.',
+        'work.card2.desc': 'Eine Web-Kommandozentrale fürs Backoffice: Live-Flotte der Agenten, Besuchszahlen, Bericht-Inbox und Pünktlichkeits-KPIs, alles in einer Ansicht.',
+        'work.card3.tag': 'Workflow',
+        'work.card3.title': 'Strukturierte Berichte statt WhatsApp-Chaos.',
+        'work.card3.desc': 'Ein Reporting-Flow mit Vorlagen, Zeitstempeln und Foto-Threads. Jeder Besuch wird durchsuchbar, statt im Chat zu verschwinden.',
+        'work.card4.tag': 'Realtime · GPS',
+        'work.card4.title': 'Live-Tracking der Agenten über 14 Gebäude.',
+        'work.card4.desc': 'GPS-Check-ins, Zonen-Pings und eine Karte, die dem Büro genau zeigt, wer wo ist, ohne ein einziges „Bist du schon da?".',
+
+        'manifesto.eyebrow': 'Eine Notiz, wie wir bauen',
+        'manifesto.text': 'Gute Software sollte sich nicht ankündigen. <span style="font-style: italic; color: #334155;">Sie sollte das Richtige zum Einfachen machen.</span> Und dann in der Arbeit verschwinden, die Ihr Team ohnehin erledigen wollte.',
+        'manifesto.attr': 'M&amp;H Tech &middot; Studio-Manifest',
+
+        'approach.label': 'Ansatz',
+        'approach.title': 'Vom ersten Anruf zum Live-Produkt<br /><span class="grad-text">in drei Phasen.</span>',
+        'approach.desc': 'Keine langen Discovery-Phasen ohne Code. Schon in Woche zwei sehen Sie etwas Konkretes, und jede Woche danach.',
+        'approach.hub': 'Ihr Projekt',
+        'approach.step.label': 'Phase',
+        'approach.step1.title': 'Scope & Form',
+        'approach.step1.desc': 'Wir treffen uns, gehen das echte Problem an und schreiben genau auf, was wir bauen. Sie bekommen einen Festpreis und einen Zeitplan, bevor sonst etwas passiert.',
+        'approach.step2.title': 'Design & Build',
+        'approach.step2.desc': 'Wir gestalten das Interface und schreiben den Code in kurzen Iterationen. Jede Woche bekommen Sie eine lauffähige Version zum Ausprobieren. Keine Black Boxes.',
+        'approach.step3.title': 'Launch & Support',
+        'approach.step3.desc': 'Wir veröffentlichen im App Store, im Web, oder wo das Produkt sonst leben muss. Danach bleiben wir, für Fixes, Updates und die Funktionen, die Nutzer nachfragen.',
+
+        'about.label': 'Das Studio',
+        'about.title': 'Zwei Ingenieure,<br /><span class="grad-text">ein gemeinsamer Standard.</span>',
+        'about.p1': 'M&amp;H Tech wurde gegründet von <strong style="color: #0B0F19;">Manuel Alvarez</strong> und <strong style="color: #0B0F19;">Hassen Ben Chaabane</strong>, zwei Informatik-Ingenieuren an der EPFL in der Schweiz. Wir haben unsere Studienjahre damit verbracht, echte Dinge zu bauen: Webplattformen, Mobile Apps, ML-Systeme. Wir wollten denselben Standard zu Unternehmen bringen, die ihn sonst nicht bekommen.',
+        'about.p2': 'Wir bleiben bewusst klein. Bei jedem Projekt sind wir zu zweit voll dabei, vom ersten Gespräch bis zur Version, die ein Jahr später läuft.',
+        'about.bullet1': 'Festpreis-Scoping',
+        'about.bullet2': 'Wöchentliche Demos',
+        'about.bullet3': 'Sie besitzen den Quellcode',
+        'about.bullet4': 'Support nach dem Launch',
+        'about.team': 'Das Team',
+        'about.role': 'Mitgründer · MSc CS @ EPFL',
+        'about.location': 'Lausanne, CH',
+
+        'contact.availability': 'Antwort innert 24 Stunden',
+        'contact.title': 'Lassen Sie uns etwas bauen,<br /><span style="background: linear-gradient(135deg, #C9A96E, #FFFFFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">das wirklich live geht.</span>',
+        'contact.desc': 'Erzählen Sie uns von Ihrem Projekt. Wir melden uns innerhalb eines Tages mit Fragen, nächsten Schritten und einer Offerte ohne Überraschungen.',
+        'contact.email.eyebrow': 'Schreiben Sie uns',
+        'contact.email.action': 'Nachricht senden',
+        'contact.next.eyebrow': 'Was als Nächstes kommt',
+        'contact.next.title': 'Antwort in 24 Stunden',
+        'contact.next.step1': '30-min Discovery-Call',
+        'contact.next.step2': 'Schriftliche Offerte + Festpreis',
+        'contact.next.step3': 'Kickoff innert einer Woche',
+        'contact.location.eyebrow': 'Mit Sitz in',
+        'contact.location.title': 'Lausanne, Schweiz',
+        'contact.location.desc': 'Wir arbeiten mit Kunden in der Schweiz, in Europa und remote.',
+        'contact.cta': 'Gespräch starten',
+        'form.eyebrow': 'Projektanfrage',
+        'form.title': 'Erzählen Sie uns, was Sie bauen.',
+        'form.name.label': 'Vollständiger Name',
+        'form.name.ph': 'Geben Sie Ihren vollständigen Namen ein',
+        'form.email.label': 'E-Mail-Adresse',
+        'form.email.ph': 'Geben Sie Ihre E-Mail-Adresse ein',
+        'form.company.label': 'Unternehmen <span class="cf-optional">(optional)</span>',
+        'form.company.ph': 'Ihr Unternehmen',
+        'form.message.label': 'Nachricht',
+        'form.message.ph': 'Was wollen Sie bauen, und was steht heute im Weg?',
+        'form.submit': 'Senden',
+        'form.fallback': 'oder schreiben Sie uns an <span class="cf-email">manuel.alvarez@mhtech.ch</span>',
+        'form.success.title': 'Erhalten. Antwort kommt.',
+        'form.success.desc': 'Wir melden uns innerhalb eines Tages mit den nächsten Schritten.',
+        'form.error': 'Etwas ist schiefgelaufen. Versuchen Sie es nochmals oder schreiben Sie uns direkt an <span class="cf-email">manuel.alvarez@mhtech.ch</span>.',
+        'form.validation.required': 'Bitte füllen Sie dieses Feld aus.',
+        'form.validation.email': 'Bitte geben Sie eine gültige E-Mail an.',
+        'toast.sent': 'Nachricht gesendet. Bis bald.',
+
+        'footer.tagline': 'Ein Schweizer Software-Studio, das Apps und Websites für ambitionierte Unternehmen baut.',
+        'footer.location': 'Lausanne, Schweiz',
+        'footer.studio': 'Studio',
+        'footer.build': 'Was wir bauen',
+        'footer.contact': 'Kontakt',
+        'footer.build.web': 'Web-Plattformen',
+        'footer.build.mobile': 'Mobile Apps (iOS + Android)',
+        'footer.build.internal': 'Interne Tools & Dashboards',
+        'footer.build.ai': 'Automatisierung & KI-Funktionen',
+        'footer.copyright': '© 2026 M&H Tech · Alle Rechte vorbehalten.',
+        'footer.built': 'Mit Sorgfalt gebaut in der Schweiz',
+
+        'toast.copied': 'E-Mail in die Zwischenablage kopiert',
+        'toast.copied.prefix': 'E-Mail kopiert: '
       }
     };
 
@@ -3526,8 +3831,15 @@
         dd.setAttribute('data-lang-current', lang);
         const code = dd.querySelector('.lang-dropdown-code');
         const name = dd.querySelector('.lang-dropdown-name');
-        if (code) code.textContent = lang.toUpperCase();
-        if (name) name.textContent = dict['lang.' + lang + '.name'] || (lang === 'fr' ? 'Français' : 'English');
+        if (code) {
+          const useEl = code.querySelector('use');
+          if (useEl) useEl.setAttribute('href', '#flag-' + lang);
+          else code.textContent = lang.toUpperCase();
+        }
+        if (name) {
+          const fallbackNames = { en: 'English', fr: 'Français', es: 'Español', de: 'Deutsch' };
+          name.textContent = dict['lang.' + lang + '.name'] || fallbackNames[lang] || 'English';
+        }
         dd.querySelectorAll('.lang-dropdown-option').forEach(opt => {
           opt.setAttribute('aria-selected', opt.dataset.lang === lang ? 'true' : 'false');
         });
@@ -3564,7 +3876,10 @@
         if (stored && translations[stored]) return stored;
       } catch (e) {}
       const nav = (navigator.language || 'en').toLowerCase();
-      return nav.startsWith('fr') ? 'fr' : 'en';
+      if (nav.startsWith('fr')) return 'fr';
+      if (nav.startsWith('es')) return 'es';
+      if (nav.startsWith('de')) return 'de';
+      return 'en';
     }
 
     document.querySelectorAll('.lang-btn').forEach(btn => {

@@ -17,7 +17,12 @@
       "Bash(lsof -ti:3001)",
       "Bash(git check-ignore *)",
       "Bash(H/our_website/config.local.example.js)",
-      "Bash(lsof -iTCP:3001 -sTCP:LISTEN -n -P)"
+      "Bash(lsof -iTCP:3001 -sTCP:LISTEN -n -P)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_close"
     ]
   }
 }
